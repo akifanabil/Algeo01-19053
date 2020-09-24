@@ -12,45 +12,51 @@ public class MatriksDriver {
 
         Matriks M = new Matriks();
 
-        System.out.println("---------------------------------------------------------------------");
-        System.out.println("PROGRAM MATRIKS DAN APLIKASI MATRIKS\n");
-
         MainMenu();
-
-        if (pil1==1){
-            // Penyelesaian SPL
-            Menu1();
-            System.out.println("1");
-        } else if (pil1==2){
-            // Determinan
-            Menu2();
-            System.out.println("2");
-        } else if (pil1==3){
-            // Mencari Invers
-            Menu3();
-            if (pil4==1){
-                M.BacaMatriks();
-                M.InversMatriks1();
-            } else if (pil4==2){
-                System.out.print("a");
-            } else{
-                System.out.print("Input salah. Harap masukan kembali input sesuai nomor menu pilihan.");
+        while (pil1!=6){
+            if (pil1==1){
+                // Penyelesaian SPL
+                Menu1();
+                System.out.println("1");
+            } else if (pil1==2){
+                // Determinan
+                Menu2();
+                System.out.println("2");
+            } else if (pil1==3){
+                // Mencari Invers
                 Menu3();
+                if (pil4==1){
+                    // Dengan menggunakan metode Gauss Jordan
+                    M.BacaMatriksPersegi();
+                    M.InversMatriks1();
+                } else if (pil4==2){
+                    // Dengan menggunakan perkalian 1/determinan dan Adjoin matriks
+                    M.BacaMatriksPersegi();
+                    M.InversMatriks2();
+                } else{
+                    System.out.print("Input salah. Harap masukan kembali input sesuai nomor menu pilihan.");
+                    Menu3();
+                }
+            } else if (pil1==4){
+                //Interpolasi polinom
+                System.out.println("4");
+            } else if (pil1==5){
+                //Regresi linear berganda
+                M.regresilinearganda();
+            } else{
+                System.out.println("Harap masukkan pilihan sesuai nomor menu pilihan");
             }
-        } else if (pil1==4){
-            //Interpolasi polinom
-            System.out.println("4");
-        } else if (pil1==5){
-            //Regresi linear berganda
-            System.out.println("5");
-        } else{
-            System.out.println("Good Bye!");
-            System.out.println("------------------------------------------------------------------------------");
+            MainMenu();
         }
+        System.out.println("--------------------------------------------------------------------------------");
+        System.out.println("Terimakasih");
     }
 
     public static void MainMenu(){
         // Method untuk menampilkan list menu utama
+        System.out.println("\n--------------------------------------------------------------------------------");
+        System.out.println("PROGRAM MATRIKS DAN APLIKASI MATRIKS\n");
+
         System.out.println("Menu :");
         System.out.println("1. Sistem Persamaan Linear");
         System.out.println("2. Determinan");
