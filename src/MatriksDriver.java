@@ -21,14 +21,23 @@ public class MatriksDriver {
             } else if (pil1==2){
                 // Determinan
                 Menu2();
-                System.out.println("2");
+                if (pil3==1) {
+                    M.BacaMatriksPersegi();
+                    System.out.println("Determinan dengan Metode Reduksi Baris : " + Determinan1(M));
+                }
+                else if (pil3==2) {
+                    System.out.println("Determinan 2"); //Belum
+                }
+                else {
+                    System.out.println("Input salah. Harap masukan kembali input sesuai nomor menu pilihan.");
+                }
             } else if (pil1==3){
                 // Mencari Invers
                 Menu3();
                 if (pil4==1){
                     // Dengan menggunakan metode Gauss Jordan
                     M.BacaMatriksPersegi();
-                    M.InversMatriks1();
+                    M.InversMatriks1(); 
                 } else if (pil4==2){
                     // Dengan menggunakan perkalian 1/determinan dan Adjoin matriks
                     M.BacaMatriksPersegi();

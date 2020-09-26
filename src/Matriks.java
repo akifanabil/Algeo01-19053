@@ -267,10 +267,17 @@ public class Matriks {
         //Aug.TulisMatriks();
     }
 
-    public float determinan(){
-        return 2;
-        
+    // TAMBAHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAANNNNNNN
+    public float Determinan1(Matriks M){
+        float Det=1;
+        ForwardPhase(M);
+        for (int i=GetFirstIdxBrs();i<=GetLastIdxBrs();i++) {
+            Det *= M.Elmt(i,i);
+            // Determinannya masih belum kasih pertimbangan tuker baris *(-1)
+        }
+        return Det;
     }
+
 
     public void InversMatriks2(){
         // Mencari Invers Matriks dengan menggunakan Determinan dan Adjoin
