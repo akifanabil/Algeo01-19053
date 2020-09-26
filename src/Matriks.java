@@ -1,4 +1,5 @@
 import java.util.Scanner;
+import java.util.Arrays;
 
 public class Matriks {
 
@@ -24,27 +25,27 @@ public class Matriks {
         KolEf = nklm;
     }
 
-    int GetFirstIdxBrs()
+    public int GetFirstIdxBrs()
     {
         return BrsMin;
     }
 
-    int GetLastIdxBrs()
+    public int GetLastIdxBrs()
     {
         return this.BrsEf+this.GetFirstIdxBrs()-1;
     }
 
-    int GetFirstIdxKol()
+    public int GetFirstIdxKol()
     {
         return KolMin;
     }
 
-    int GetLastIdxKol()
+    public int GetLastIdxKol()
     {
         return this.KolEf+this.GetFirstIdxKol()-1;
     }
 
-    void BacaMatriks()
+    public void BacaMatriks()
     {
         // Membaca jumlah baris dan kolom efektif matriks serta mengisi matriks. 
         int i,j;
@@ -72,7 +73,7 @@ public class Matriks {
         }
     }
 
-    void BacaMatriksPersegi()
+    public void BacaMatriksPersegi()
     {
         // Membaca jumlah ukuran efektif matriks persegi serta mengisi matriks.  Tidak menerima ukuran efektif baris/kolom (Akan divalidasi terlebih dahulu)
         int i,j;
@@ -94,7 +95,7 @@ public class Matriks {
         }
     }
 
-    float Elmt(int idxbrs, int idxkol){
+    public float Elmt(int idxbrs, int idxkol){
         // Mendapat elemen matriks M baris id ke [idxbrs][idxkol]
         return this.M[idxbrs][idxkol];
     }
@@ -113,6 +114,122 @@ public class Matriks {
             }
             System.out.println("");
         }
+    }
+
+    public void TukarBaris(Matriks M, int i1, int i2) {
+    	int j;
+    	float temp;
+    	
+    	// Menukar baris
+    	for (j=GetFirstIdxBrs(); j<=GetLastIdxBrs(); j++) {
+    		temp = M.Elmt(i1, j);
+    		M.SetElmt(i1, j, M.Elmt(i2, j));
+    		M.SetElmt(i2, j, temp);
+        }
+    }
+    
+    public void ForwardPhase(Matriks M) {
+    	int i, j, k, imax;
+    	float max, faktor, temp;
+    	
+    	for (k=GetFirstIdxKol(); k<=GetLastIdxKol(); k++) {
+            
+            // Mencari nilai maksimum di kolom
+            imax = k;
+    		max = M.Elmt(GetFirstIdxBrs(), k);
+    		for (i=k+1; i<=GetLastIdxBrs(); i++) {
+    			if (M.Elmt(i, k) > max) 
+    				max = M.Elmt(i, k);
+    				imax = i;
+    		}
+    		
+    		// Menukar Baris dengan Baris yang ada Nilai Max
+    		if (imax != k)
+    			TukarBaris(M, k, imax);
+            
+            // Melakukan reduksi
+    		for (i=k+1; i<=GetLastIdxBrs(); i++) {
+    			faktor = M.Elmt(i, k)/M.Elmt(k, k);
+    			for (j=GetFirstIdxKol(); j<=GetLastIdxKol(); j++) {
+    				temp = M.Elmt(i, j) - (M.Elmt(k, j) * faktor);
+    				M.SetElmt(i, j, temp);
+    			M.SetElmt(i, k, 0);
+    			}
+    		}
+    	}
+    }
+    
+    public float[] BackSubs(Matriks M) {
+        int i, j;
+        float sum;
+    	
+    	// Membuat array solusi dan inisialisasi value
+    	float[] solusi = new float[GetLastIdxKol()];
+    	for (j=GetFirstIdxKol(); j<=GetLastIdxKol(); j++) {
+    		solusi[j] = -999;
+    	}
+    	
+    	// Menghitung solusi
+    	for (i=GetLastIdxBrs(); i>=GetFirstIdxBrs(); i--) {
+    		solusi[i] = M.Elmt(i, GetLastIdxKol());
+    		for (j=i+1; j<=GetLastIdxBrs(); j++) {
+    			solusi[i] -= (M.Elmt(i, j) * solusi[j]);
+    		}
+    		solusi[i] = solusi[i]/M.Elmt(i, i);
+    	}
+    	return solusi;
+    }
+    
+    public void printSolusi(float[] array) {
+        int panjang = array.length ;
+        int i;
+
+        for (i=0; i<panjang; i++) {
+            if (array[i] != -999) {
+                System.out.println("x" + panjang + " = " + array[i] );
+            }
+        }
+    }
+
+    public void splGauss(Matriks M){
+        float[] solusi;
+
+        ForwardPhase(M);
+        solusi = BackSubs(M);
+        printSolusi(solusi);
+    }
+
+    public void BackwardPhase(Matriks M) {
+        int i, j, k, l;
+        float faktor, temp;
+
+        i=GetLastIdxBrs();
+        j=GetFirstIdxKol();
+        while (i>=GetFirstIdxBrs() && j<=GetLastIdxKol()) {
+            if (M.Elmt(i, j) != 0) {
+                // Membuat nilai utama 1
+                for (k=GetFirstIdxBrs(); k<=GetLastIdxBrs(); k++) {
+                    M.SetElmt(i, k, M.Elmt(i, k)/M.Elmt(i, j));
+                }
+                // Membuat nilai lain 0
+                for (k=i-1; k>=GetFirstIdxBrs(); k--) {
+                    faktor = M.Elmt(k, j)/M.Elmt(i, j); // udh aman kalau nilai utama udh 1
+                    for (l=GetFirstIdxKol(); l<=GetLastIdxKol(); l++) {
+                        temp = M.Elmt(k, l) - (M.Elmt(i, l)*faktor);
+                        M.SetElmt(k, l, temp);
+                    }
+                }
+                i++;
+            }  
+            j++;
+        }
+        // Menghitung solusi 
+
+    }
+
+    public void splGaussJordan(Matriks M){
+        ForwardPhase(M);
+        BackwardPhase(M);
     }
 
     public void InversMatriks1(){
