@@ -23,7 +23,7 @@ public class MatriksDriver {
             if (pilinput==1){
                 if (pil1==1){
                     M.BacaMatriks();
-                } else if (pil1==2 && pil1==3){
+                } else if (pil1==2 || pil1==3){
                     M.BacaMatriksPersegi();
                 }
             } else{
@@ -32,7 +32,7 @@ public class MatriksDriver {
             }
 
     
-            // 
+            // Menjalankan pilihan menu utama
             if (pil1==1){
                 // Penyelesaian SPL
 
@@ -55,12 +55,11 @@ public class MatriksDriver {
 
                 //Menampilkan menu pilihan metode pencarian nilai determinan
                 Menu2();
-
-                //Melakukan pencarian nilai determinan berdasarkan pilihan metode
-                if (pil2==1){
-
-                } else{
-
+                if (pil3==1) {
+                    System.out.println("Determinan dengan Metode Reduksi Baris : " + M.Determinan1(M));
+                }
+                else {
+                    System.out.println("Determinan 2"); //Belum
                 }
 
             } else if (pil1==3){

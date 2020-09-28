@@ -316,10 +316,17 @@ public class Matriks {
         }
     }
 
-    public float determinan(){
-        return 2;
-        
+    // TAMBAHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAANNNNNNN
+    public float Determinan1(Matriks M){
+        float Det=1;
+        ForwardPhase(M);
+        for (int i=M.GetFirstIdxBrs();i<=M.GetLastIdxBrs();i++) {
+            Det *= M.Elmt(i,i);
+            // Determinannya masih belum kasih pertimbangan tuker baris *(-1)
+        }
+        return Det;
     }
+
 
     public void InversMatriks2(){
         // Mencari Invers Matriks dengan menggunakan Determinan dan Adjoin
@@ -345,7 +352,7 @@ public class Matriks {
                         jm=GetFirstIdxKol();
                     }
                 }
-                Kofaktor.SetElmt(i,j,((i+j)%2==0)? Minor.determinan():-1*Minor.determinan());
+                Kofaktor.SetElmt(i,j,((i+j)%2==0)? Determinan1(Minor):-1*Determinan1(Minor));
                 im=GetFirstIdxBrs();
             }
         }
@@ -356,7 +363,7 @@ public class Matriks {
         Matriks Invers = new Matriks(this.BrsEf,this.KolEf);
         Adjoin = Kofaktor.Transpose();
 
-        float determinan=determinan();
+        float determinan=Determinan1(this);
 
         if (determinan !=0){
             for (int i=GetFirstIdxBrs();i<=GetLastIdxBrs();i++){
