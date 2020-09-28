@@ -1,5 +1,6 @@
 import java.util.Scanner;
-import java.util.Arrays;
+import java.io.File;
+import java.io.FileNotFoundException;
 
 public class Matriks {
 
@@ -95,6 +96,40 @@ public class Matriks {
         }
     }
 
+    public void BacaFileMatriks(String file){
+        try {
+            File f = new File(file);
+            Scanner Reader = new Scanner(f);
+            this.BrsEf=0;
+            while (Reader.hasNextLine()) {
+              this.BrsEf++;
+              Reader.nextLine();
+            }
+            Reader.close();
+            
+            Reader = new Scanner(f);
+            int nel=0;
+            while (Reader.hasNextFloat()) {
+                nel++;
+                Reader.nextFloat();
+            }
+            this.KolEf=nel/this.BrsEf;
+            Reader.close();
+
+            M = new float [BrsEf][KolEf];
+            Reader = new Scanner(f);
+            for (int i=GetFirstIdxBrs();i<=GetLastIdxBrs();i++){
+                for (int j=GetFirstIdxKol();j<=GetLastIdxKol();j++){
+                    SetElmt(i, j, Reader.nextFloat());
+                }
+            }
+            Reader.close();
+        } catch (FileNotFoundException e){
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
+    }
+
     public float Elmt(int idxbrs, int idxkol){
         // Mendapat elemen matriks M baris id ke [idxbrs][idxkol]
         return this.M[idxbrs][idxkol];
@@ -110,7 +145,7 @@ public class Matriks {
         {
             for (j=GetFirstIdxKol();j<=GetLastIdxKol();j++)
             {
-                System.out.print(this.M[i][j]+"    ");
+                System.out.printf("%.3f    ",this.M[i][j]);
             }
             System.out.println("");
         }
@@ -121,7 +156,7 @@ public class Matriks {
     	float temp;
     	
     	// Menukar baris
-    	for (j=GetFirstIdxBrs(); j<=GetLastIdxBrs(); j++) {
+    	for (j=M.GetFirstIdxKol(); j<=M.GetLastIdxKol(); j++) {
     		temp = M.Elmt(i1, j);
     		M.SetElmt(i1, j, M.Elmt(i2, j));
     		M.SetElmt(i2, j, temp);
@@ -132,12 +167,12 @@ public class Matriks {
     	int i, j, k, imax;
     	float max, faktor, temp;
     	
-    	for (k=GetFirstIdxKol(); k<=GetLastIdxKol(); k++) {
+    	for (k=M.GetFirstIdxKol(); k<=M.GetLastIdxKol(); k++) {
             
             // Mencari nilai maksimum di kolom
             imax = k;
-    		max = M.Elmt(GetFirstIdxBrs(), k);
-    		for (i=k+1; i<=GetLastIdxBrs(); i++) {
+    		max = M.Elmt(M.GetFirstIdxBrs(), k);
+    		for (i=k+1; i<=M.GetLastIdxBrs(); i++) {
     			if (M.Elmt(i, k) > max) 
     				max = M.Elmt(i, k);
     				imax = i;
@@ -148,9 +183,9 @@ public class Matriks {
     			TukarBaris(M, k, imax);
             
             // Melakukan reduksi
-    		for (i=k+1; i<=GetLastIdxBrs(); i++) {
+    		for (i=k+1; i<=M.GetLastIdxBrs(); i++) {
     			faktor = M.Elmt(i, k)/M.Elmt(k, k);
-    			for (j=GetFirstIdxKol(); j<=GetLastIdxKol(); j++) {
+    			for (j=M.GetFirstIdxKol(); j<=M.GetLastIdxKol(); j++) {
     				temp = M.Elmt(i, j) - (M.Elmt(k, j) * faktor);
     				M.SetElmt(i, j, temp);
     			M.SetElmt(i, k, 0);
@@ -161,18 +196,17 @@ public class Matriks {
     
     public float[] BackSubs(Matriks M) {
         int i, j;
-        float sum;
-    	
+
     	// Membuat array solusi dan inisialisasi value
-    	float[] solusi = new float[GetLastIdxKol()];
-    	for (j=GetFirstIdxKol(); j<=GetLastIdxKol(); j++) {
+    	float[] solusi = new float[M.GetLastIdxKol()];
+    	for (j=M.GetFirstIdxKol(); j<=GetLastIdxKol(); j++) {
     		solusi[j] = -999;
     	}
     	
     	// Menghitung solusi
-    	for (i=GetLastIdxBrs(); i>=GetFirstIdxBrs(); i--) {
-    		solusi[i] = M.Elmt(i, GetLastIdxKol());
-    		for (j=i+1; j<=GetLastIdxBrs(); j++) {
+    	for (i=M.GetLastIdxBrs(); i>=M.GetFirstIdxBrs(); i--) {
+    		solusi[i] = M.Elmt(i, M.GetLastIdxKol());
+    		for (j=i+1; j<=M.GetLastIdxBrs(); j++) {
     			solusi[i] -= (M.Elmt(i, j) * solusi[j]);
     		}
     		solusi[i] = solusi[i]/M.Elmt(i, i);
@@ -203,18 +237,18 @@ public class Matriks {
         int i, j, k, l;
         float faktor, temp;
 
-        i=GetLastIdxBrs();
-        j=GetFirstIdxKol();
-        while (i>=GetFirstIdxBrs() && j<=GetLastIdxKol()) {
+        i=M.GetLastIdxBrs();
+        j=M.GetFirstIdxKol();
+        while (i>=M.GetFirstIdxBrs() && j<=M.GetLastIdxKol()) {
             if (M.Elmt(i, j) != 0) {
                 // Membuat nilai utama 1
-                for (k=GetFirstIdxBrs(); k<=GetLastIdxBrs(); k++) {
+                for (k=M.GetFirstIdxBrs(); k<=M.GetLastIdxBrs(); k++) {
                     M.SetElmt(i, k, M.Elmt(i, k)/M.Elmt(i, j));
                 }
                 // Membuat nilai lain 0
-                for (k=i-1; k>=GetFirstIdxBrs(); k--) {
+                for (k=i-1; k>=M.GetFirstIdxBrs(); k--) {
                     faktor = M.Elmt(k, j)/M.Elmt(i, j); // udh aman kalau nilai utama udh 1
-                    for (l=GetFirstIdxKol(); l<=GetLastIdxKol(); l++) {
+                    for (l=M.GetFirstIdxKol(); l<=M.GetLastIdxKol(); l++) {
                         temp = M.Elmt(k, l) - (M.Elmt(i, l)*faktor);
                         M.SetElmt(k, l, temp);
                     }
@@ -231,6 +265,7 @@ public class Matriks {
         ForwardPhase(M);
         BackwardPhase(M);
     }
+
 
     public void InversMatriks1(){
         // Mendeklarasikan Matriks Aug yang merupakan matriks augmented matriks M dengan matriks satuannya
@@ -259,12 +294,26 @@ public class Matriks {
                 }
             }
         }
+        // Aug.TulisMatriks();
 
         //Melakukan operasi OBE dengan metode Gauss-Jordan
+        ForwardPhase(Aug);
 
+        // Aug.TulisMatriks();
         //Ambil matriks dri kolom this.getlastkol()+1 sampe Aug.getlastkol()
-
-        //Aug.TulisMatriks();
+        Matriks Invers = new Matriks(Aug.GetLastIdxBrs()+1,Aug.GetLastIdxBrs()+1);
+        if (Aug.Elmt(Aug.GetLastIdxBrs(),Aug.GetLastIdxBrs()) == 1){
+            // Punya invers
+            for (i=Aug.GetFirstIdxBrs();i<=Aug.GetLastIdxBrs();i++){
+                for (j=Aug.GetLastIdxBrs()+1;j<=Aug.GetLastIdxKol();j++){
+                    Invers.SetElmt(i, j-Aug.GetLastIdxBrs()-1, Aug.Elmt(i, j));
+                }
+            }
+            Invers.TulisMatriks();
+        } else{
+            // Tidak punya invers
+            System.out.println("Matriks tidak memiliki invers");
+        }
     }
 
     public float determinan(){
@@ -296,7 +345,6 @@ public class Matriks {
                         jm=GetFirstIdxKol();
                     }
                 }
-                Minor.TulisMatriks();
                 Kofaktor.SetElmt(i,j,((i+j)%2==0)? Minor.determinan():-1*Minor.determinan());
                 im=GetFirstIdxBrs();
             }
@@ -309,12 +357,17 @@ public class Matriks {
         Adjoin = Kofaktor.Transpose();
 
         float determinan=determinan();
-        for (int i=GetFirstIdxBrs();i<=GetLastIdxBrs();i++){
-            for (int j=GetFirstIdxKol();j<=GetLastIdxKol();j++){
-                Invers.SetElmt(i, j, Adjoin.Elmt(i, j)/determinan);
+
+        if (determinan !=0){
+            for (int i=GetFirstIdxBrs();i<=GetLastIdxBrs();i++){
+                for (int j=GetFirstIdxKol();j<=GetLastIdxKol();j++){
+                    Invers.SetElmt(i, j, Adjoin.Elmt(i, j)/determinan);
+                }
             }
+            Invers.TulisMatriks();
+        } else{
+            System.out.println("Matriks tidak memiliki invers.");
         }
-        Invers.TulisMatriks();
     }
 
 
@@ -329,7 +382,7 @@ public class Matriks {
         }
         return TransposeM;
     }
-
+    
     public void regresilinearganda(){
         //Membaca banyak elemen variabel independen x
         System.out.println("Input nilai variabel peubah x dan variabel terkait y");
@@ -401,10 +454,5 @@ public class Matriks {
             sum+=hasilspl.Elmt(hasilspl.GetFirstIdxBrs(), i)*xk.Elmt(xk.GetFirstIdxBrs(), i-1);
         }
         System.out.println(sum);
-
-
-
-
-
     }
 }
