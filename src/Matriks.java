@@ -194,21 +194,6 @@ public class Matriks {
     		}
     	}
     }
-
-    public boolean[] issolusiparametrik(){
-        int i,j,k;
-        boolean[] isxparam = new boolean[KolEf-1];
-        for (k=0;k<=BrsEf-1;k++){
-            isxparam[k] = false;
-        }
-
-        for (i=GetLastIdxBrs();i>=GetFirstIdxBrs();i++){
-            for (j=GetFirstIdxKol();j<GetLastIdxKol();j++){
-
-            }
-        }
-        return isxparam;
-    }
     
     public float[] BackSubs() {
         int i, j,k;
