@@ -572,6 +572,75 @@ public class Matriks {
         }
         return TransposeM;
     }
+
+    public void Interpolasi() {
+        // Mencari polinom interpolasi derajat n
+        float Taksir=0;
+        System.out.print("Masukkan derajat polinom interpolasi : ");
+        int N = scanner.nextInt();
+
+        // Indeks titik X dan Y
+        int x = 0;
+        int y = 1;
+
+        // Membuat matriks sistem persamaan lanjar
+        Matriks Persamaan = new Matriks(N+1,N+2);
+        for (int i=Persamaan.GetFirstIdxBrs();i<=Persamaan.GetLastIdxBrs();i++) {
+            for (int j=Persamaan.GetFirstIdxKol();j<=Persamaan.GetLastIdxKol();j++) {
+                if (j==Persamaan.GetFirstIdxKol()) {
+                    Persamaan.SetElmt(i, j, 1);
+                }
+                else if (j==Persamaan.GetLastIdxKol()) {
+                    Persamaan.SetElmt(i, j, this.Elmt(i,y));
+                }
+                else {
+                    double Hasil = Math.pow(this.Elmt(i,x),j);
+                    float Pangkat = (float)Hasil;
+                    Persamaan.SetElmt(i, j, Pangkat);
+                }
+            }
+        }
+
+        // Mencari dan menampilkan koefisien persamaan
+        Persamaan.splGaussJordan();
+
+        // Menampilkan polinom interpolasi
+        for (int i=Persamaan.GetFirstIdxBrs();i<=Persamaan.GetLastIdxBrs();i++) {
+            if (i==0) {
+                System.out.print("p" + N + "(x) = ");
+                if (Persamaan.Elmt(i,Persamaan.GetLastIdxKol())!=0) {
+                    System.out.print(Persamaan.Elmt(i,Persamaan.GetLastIdxKol()));
+                }
+            }
+            else if (i==1) {
+                if (Persamaan.Elmt(i,Persamaan.GetLastIdxKol())>0) {
+                    System.out.print(" + " + Persamaan.Elmt(i,Persamaan.GetLastIdxKol()) + "x");
+                }
+                else if (Persamaan.Elmt(i,Persamaan.GetLastIdxKol())<0) {
+                    System.out.print(" - " + Math.abs(Persamaan.Elmt(i,Persamaan.GetLastIdxKol())) + "x");
+                }
+            }
+            else {
+                if (Persamaan.Elmt(i,Persamaan.GetLastIdxKol())>0) {
+                    System.out.print(" + " + Persamaan.Elmt(i,Persamaan.GetLastIdxKol()) + "x^" + i);
+                }
+                else if (Persamaan.Elmt(i,Persamaan.GetLastIdxKol())<0) {
+                    System.out.print(" - " + Math.abs(Persamaan.Elmt(i,Persamaan.GetLastIdxKol())) + "x^" + i);
+                }
+            }
+        }
+        System.out.println("");
+
+        // Menerima nilai X yang ingin ditaksir
+        System.out.print("Masukkan nilai X yang ingin ditaksir : ");
+        Float X = scanner.nextFloat();
+
+        // Menampilkan hasil taksiran
+        for (int i=Persamaan.GetFirstIdxBrs();i<Persamaan.GetLastIdxBrs();i++) {
+            Taksir += (Persamaan.Elmt(i,Persamaan.GetLastIdxKol())*(Math.pow(X,i)));
+        }
+        System.out.println("Hasil taksiran polinom interpolasi yaitu : " + Taksir);
+    }
     
     public void regresilinearganda(){
         //Membaca banyak elemen variabel independen x

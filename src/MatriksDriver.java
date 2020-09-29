@@ -25,6 +25,11 @@ public class MatriksDriver {
                     M.BacaMatriks();
                 } else if (pil1==2 || pil1==3){
                     M.BacaMatriksPersegi();
+                } else if (pil1==4) {
+                    System.out.println("Petunjuk:");
+                    System.out.println("Jumlah baris : derajat + 1");
+                    System.out.println("Jumlah baris : 2");
+                    M.BacaMatriks();
                 }
             } else{
                 // Input dibaca dari file
@@ -84,7 +89,8 @@ public class MatriksDriver {
 
             } else if (pil1==4){
                 //Interpolasi polinom
-                System.out.println(4);
+
+                M.Interpolasi();
 
             } else{
                 //Regresi linear berganda
