@@ -62,10 +62,10 @@ public class MatriksDriver {
                 //Menampilkan menu pilihan metode pencarian nilai determinan
                 Menu2();
                 if (pil3==1) {
-                    System.out.println("Determinan dengan Metode Reduksi Baris : " + M.Determinan1(M));
+                    System.out.println("Determinan dengan Metode Reduksi Baris : " + M.Determinan1());
                 }
                 else {
-                    System.out.println("Determinan 2"); //Belum
+                    System.out.println("Determinan dengan Metode Ekspansi Kofaktor : " + M.Determinan2());
                 }
 
             } else if (pil1==3){

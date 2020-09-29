@@ -1,12 +1,14 @@
 import java.util.Scanner;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.lang.Math;
 
 public class Matriks {
 
     int BrsEf,KolEf;
     int BrsMin = 0;
-    int KolMin= 0;
+    int KolMin = 0;
+    int Tukar = 0;
     boolean nosolutionspl;
     float[][] M;
 
@@ -177,6 +179,7 @@ public class Matriks {
                     i++;
                 }
                 TukarBaris(GetFirstIdxBrs(), i);
+                Tukar++;
             }
     		
     		// Melakukan reduksi
@@ -449,17 +452,64 @@ public class Matriks {
         }
     }
 
-    // TAMBAHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAANNNNNNN
-    public float Determinan1(Matriks M){
+    public float Determinan1() {
+        // Mencari Determinan dengan menggunakan metode Reduksi Baris
         float Det=1;
-        M.ForwardPhase();
-        for (int i=M.GetFirstIdxBrs();i<=M.GetLastIdxBrs();i++) {
-            Det *= M.Elmt(i,i);
-            // Determinannya masih belum kasih pertimbangan tuker baris *(-1)
+
+        // Mengubah matriks menjadi matriks segitiga atas
+        this.ForwardPhase();
+
+        // Mengalikan diagonal utama matriks untuk mencari determinan
+        for (int i=this.GetFirstIdxBrs();i<=this.GetLastIdxBrs();i++) {
+            Det *= this.Elmt(i,i);
         }
+
+        // Mengalikan determinan dengan (-1) sebanyak Tukar, yaitu jumlah pertukaran baris
+        // saat mengubah matriks menjadi segitiga atas
+        Det *= Math.pow(-1,Tukar);
+
+        // Mengembalikan nilai tukar ke 0, untuk proses berikutnya
+        Tukar = 0;
         return Det;
     }
 
+    public float Determinan2() {
+        // Mencari Determinan dengan menggunakan metode Ekspansi Kofaktor
+        float Det=0;
+        int Baris1=GetFirstIdxBrs();
+
+        // Menbentuk matriks minor -> mencari minor -> matriks kofaktor
+        int Cek1=GetFirstIdxBrs(),Cek2=GetFirstIdxKol();
+        Matriks Kofaktor = new Matriks(this.BrsEf,this.KolEf);
+        Matriks Minor=new Matriks(this.BrsEf-1,this.KolEf-1);
+        for (int i=GetFirstIdxBrs();i<=GetLastIdxBrs();i++){
+            for (int j=GetFirstIdxKol();j<=GetLastIdxKol();j++){
+                for (int k=GetFirstIdxBrs();k<=GetLastIdxBrs();k++)
+                {
+                    if (k!=i){
+                        for (int l=GetFirstIdxKol();l<=GetLastIdxKol();l++)
+                        {
+                            if (j!=l){
+                                Minor.SetElmt(Cek1, Cek2, this.Elmt(k, l));
+                                Cek2++;
+                            }
+                        }
+                        Cek1++;
+                        Cek2=GetFirstIdxKol();
+                    }
+                }
+                Kofaktor.SetElmt(i,j,((i+j)%2==0)? Minor.Determinan1():-1*Minor.Determinan1());
+                Cek1=GetFirstIdxBrs();
+            }
+        }
+
+        // Mencari Determinan dengan baris pertama sebagai acuan
+        for (int j=GetFirstIdxKol();j<=GetLastIdxKol();j++) {
+            Det += this.Elmt(Baris1,j)*Kofaktor.Elmt(Baris1,j);
+        }
+
+        return Det;
+    }
 
     public void InversMatriks2(){
         // Mencari Invers Matriks dengan menggunakan Determinan dan Adjoin
@@ -485,7 +535,7 @@ public class Matriks {
                         jm=GetFirstIdxKol();
                     }
                 }
-                Kofaktor.SetElmt(i,j,((i+j)%2==0)? Determinan1(Minor):-1*Determinan1(Minor));
+                Kofaktor.SetElmt(i,j,((i+j)%2==0)? Minor.Determinan1():-1*Minor.Determinan1());
                 im=GetFirstIdxBrs();
             }
         }
@@ -496,7 +546,7 @@ public class Matriks {
         Matriks Invers = new Matriks(this.BrsEf,this.KolEf);
         Adjoin = Kofaktor.Transpose();
 
-        float determinan=Determinan1(this);
+        float determinan=Determinan1();
 
         if (determinan !=0){
             for (int i=GetFirstIdxBrs();i<=GetLastIdxBrs();i++){
