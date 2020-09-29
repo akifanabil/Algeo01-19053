@@ -152,44 +152,40 @@ public class Matriks {
         }
     }
 
-    public void TukarBaris(Matriks M, int i1, int i2) {
+    public void TukarBaris(int i1, int i2) {
     	int j;
     	float temp;
     	
     	// Menukar baris
-    	for (j=M.GetFirstIdxKol(); j<=M.GetLastIdxKol(); j++) {
-    		temp = M.Elmt(i1, j);
-    		M.SetElmt(i1, j, M.Elmt(i2, j));
-    		M.SetElmt(i2, j, temp);
+    	for (j=GetFirstIdxKol(); j<=GetLastIdxKol(); j++) {
+    		temp = Elmt(i1, j);
+    		SetElmt(i1, j, Elmt(i2, j));
+    		SetElmt(i2, j, temp);
         }
     }
     
-    public void ForwardPhase(Matriks M) {
+    public void ForwardPhase() {
     	int i, j, k, imax;
     	float max, faktor, temp;
     	
-    	for (k=M.GetFirstIdxKol(); k<=M.GetLastIdxKol(); k++) {
+    	for (k=GetFirstIdxKol(); k<=GetLastIdxKol(); k++) {
             
-            // Mencari nilai maksimum di kolom
-            imax = k;
-    		max = M.Elmt(M.GetFirstIdxBrs(), k);
-    		for (i=k+1; i<=M.GetLastIdxBrs(); i++) {
-    			if (M.Elmt(i, k) > max) 
-    				max = M.Elmt(i, k);
-    				imax = i;
-    		}
+            // Menukar baris jika elemen pertama adalah 0
+            if (Elmt(GetFirstIdxBrs(), GetFirstIdxKol()) == 0) {
+                i = GetFirstIdxBrs()+1;
+                while (Elmt(i, GetFirstIdxKol()) == 0 ) {
+                    i++;
+                }
+                TukarBaris(GetFirstIdxBrs(), i);
+            }
     		
-    		// Menukar Baris dengan Baris yang ada Nilai Max
-    		if (imax != k)
-    			TukarBaris(M, k, imax);
-            
-            // Melakukan reduksi
-    		for (i=k+1; i<=M.GetLastIdxBrs(); i++) {
-    			faktor = M.Elmt(i, k)/M.Elmt(k, k);
-    			for (j=M.GetFirstIdxKol(); j<=M.GetLastIdxKol(); j++) {
-    				temp = M.Elmt(i, j) - (M.Elmt(k, j) * faktor);
-    				M.SetElmt(i, j, temp);
-    			M.SetElmt(i, k, 0);
+    		// Melakukan reduksi
+    		for (i=k+1; i<=GetLastIdxBrs(); i++) {
+    			faktor = Elmt(i, k)/Elmt(k, k);
+    			for (j=GetFirstIdxKol(); j<=GetLastIdxKol(); j++) {
+    				temp = Elmt(i, j) - (Elmt(k, j) * faktor);
+    				SetElmt(i, j, temp);
+    			// SetElmt(i, k, 0);
     			}
     		}
     	}
@@ -340,47 +336,68 @@ public class Matriks {
         System.out.println(" bilangan real.");
     }
     
+    public void LeadingOne(){
+        int i, j, k;
 
-    public void splGauss(Matriks M){
+        i = GetFirstIdxBrs();
+        j = GetFirstIdxKol();
+        while (i<=GetLastIdxBrs() && j<=GetLastIdxKol()) {
+            if (Elmt(i, j) != 0) {
+                for (k=GetFirstIdxKol(); k<=GetLastIdxKol(); k++) {
+                    SetElmt(i, k, Elmt(i, k)/Elmt(i, j));
+                }
+                i++;
+            }
+            j++;
+        }
+    }
+
+    public void splGauss(){
         float[] solusi;
 
-        ForwardPhase(M);
-        solusi = M.BackSubs();
+        ForwardPhase();
+        LeadingOne();
+        solusi = BackSubs();
         printsolusispl(solusi);
     }
 
-    public void BackwardPhase(Matriks M) {
+    public void BackwardPhase() {
         int i, j, k, l;
         float faktor, temp;
 
-        i=M.GetLastIdxBrs();
-        j=M.GetFirstIdxKol();
-        while (i>=M.GetFirstIdxBrs() && j<=M.GetLastIdxKol()) {
-            if (M.Elmt(i, j) != 0) {
-                // Membuat nilai utama 1
-                for (k=M.GetFirstIdxKol(); k<=M.GetLastIdxKol(); k++) {
-                    M.SetElmt(i, k, M.Elmt(i, k)/M.Elmt(i, j));
-                }
-                // Membuat nilai lain 0
-                for (k=i-1; k>=M.GetFirstIdxBrs(); k--) {
-                    faktor = M.Elmt(k, j)/M.Elmt(i, j); // udh aman kalau nilai utama udh 1
-                    for (l=M.GetFirstIdxKol(); l<=M.GetLastIdxKol(); l++) {
-                        temp = M.Elmt(k, l) - (M.Elmt(i, l)*faktor);
-                        M.SetElmt(k, l, temp);
+        i=GetLastIdxBrs();
+        j=GetFirstIdxKol();
+        while (i>=GetFirstIdxBrs() && j<=GetLastIdxKol()) {
+            if (Elmt(i, j) != 0) {
+                // Melakukan reduksi
+                for (k=i-1; k>=GetFirstIdxBrs(); k--) {
+                    faktor = Elmt(k, j)/Elmt(i, j); // udh aman kalau nilai utama udh 1
+                    for (l=GetFirstIdxKol(); l<=GetLastIdxKol(); l++) {
+                        temp = Elmt(k, l) - (Elmt(i, l)*faktor);
+                        SetElmt(k, l, temp);
                     }
                 }
                 i--;
             }  
             j++;
         }
-        // Menghitung solusi 
     }
 
-    public void splGaussJordan(Matriks M){
-        ForwardPhase(M);
-        BackwardPhase(M);
+    public void splGaussJordan(){
+        float[] solusi;
+
+        ForwardPhase();
+        LeadingOne();
+        BackwardPhase();
+        solusi = BackSubs();
+        printsolusispl(solusi);
     }
 
+    public void splMatriksBalikan() {
+        
+    }
+
+    public void splCramer() {}
 
     public void InversMatriks1(){
         // Mendeklarasikan Matriks Aug yang merupakan matriks augmented matriks M dengan matriks satuannya
@@ -412,8 +429,8 @@ public class Matriks {
         // Aug.TulisMatriks();
 
         //Melakukan operasi OBE dengan metode Gauss-Jordan
-        ForwardPhase(Aug);
-        BackwardPhase(Aug);
+        Aug.ForwardPhase();
+        Aug.BackwardPhase();
 
         // Aug.TulisMatriks();
         //Ambil matriks dri kolom this.getlastkol()+1 sampe Aug.getlastkol()
@@ -435,7 +452,7 @@ public class Matriks {
     // TAMBAHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAANNNNNNN
     public float Determinan1(Matriks M){
         float Det=1;
-        ForwardPhase(M);
+        M.ForwardPhase();
         for (int i=M.GetFirstIdxBrs();i<=M.GetLastIdxBrs();i++) {
             Det *= M.Elmt(i,i);
             // Determinannya masih belum kasih pertimbangan tuker baris *(-1)

@@ -41,11 +41,17 @@ public class MatriksDriver {
 
                 //Melakukan pemrosesan untuk mencari penyelesaian SPL sesuai input pilihan metode penyelesaian SPL
                 if (pil2==1){
-
+                    // Metode eliminasi Gauss
+                    M.splGauss();
                 } else if(pil2==2){
-
+                    // Metode eliminasi Gauss-Jordan
+                    M.splGaussJordan();
                 } else if (pil2==3){
-
+                    // Metode matriks balikan
+                    M.splMatriksBalikan();
+                } else if (pil2==4){
+                    // Kaidah Cramer
+                    
                 } else{
 
                 }
