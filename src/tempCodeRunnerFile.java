@@ -1,0 +1,1 @@
+M.printInversMatriks1(M.InversMatriks1());

@@ -444,6 +444,7 @@ public class Matriks {
                 A.SetElmt(i, j, this.Elmt(i, j));
             }
         }
+        A.TulisMatriks();
 
         // Menyalin elemen ke matriks B
         for(i=this.GetFirstIdxBrs();i<=this.GetLastIdxBrs();i++)
@@ -459,52 +460,155 @@ public class Matriks {
             }
         }
 
-        A.TulisMatriks();
-
         // A^(-1)*A*x = A^(-1)*B maka dicari invers A
         if (A.Determinan2() == 0) {
             // A tidak punya invers
             if (homogen) {
                 // SPL memiliki solusi non-trivial
-                System.out.println("\nSistem Persamaan Linear tidak memiliki balikan dan memiliki solusi non-trivial");
+                System.out.println("\nSistem Persamaan Linear tidak memiliki balikan, homogen, dan memiliki solusi non-trivial");
                 // Menghitung solusi menggunakan metode lain
                 splGauss();
             }
             else {
                 // SPL tidak memiliki solusi yang tunggal (unik)
-                System.out.println("\nSistem Persamaan Linear tidak memiliki balikan dan tidak memiliki solusi yang unik");
+                System.out.println("\nSistem Persamaan Linear tidak memiliki balikan, tidak homogen, dan tidak memiliki solusi yang unik");
                 splGauss();
             }
             // System.out.println("\nSistem Persamaan Linear tidak memiliki penyelesaian.");
         }
         else { 
             // A memiliki invers
-            A=InversMatriks1();
+            A = A.InversMatriks1();
+            A.TulisMatriks();
             // Perkalian invers A dengan B
             for (i=A.GetFirstIdxBrs(); i<=A.GetLastIdxBrs(); i++) {
                 temp = 0;
                 for (j=A.GetFirstIdxKol(); j<=A.GetLastIdxKol(); j++) {
                     temp += A.Elmt(i, j) * B.Elmt(j, 0);
+                    System.out.println(A.Elmt(i, j));
+                    System.out.println(B.Elmt(i, 0));
                 }
-                // X.SetElmt(j, 1, temp);
                 X[i] = temp;
+                System.out.println(X[i]);
             }
             if (homogen) {
                 // SPL memiliki solusi trivial
-                System.out.println("\nSistem Persamaan Linear memiliki balikan dan memiliki solusi trivial");
+                System.out.println("\nSistem Persamaan Linear memiliki balikan, homogen, dan memiliki solusi trivial");
                 // Menghitung solusi menggunakan metode lain
                 printsolusisplunik(X);
             }
             else {
                 // SPL memiliki solusi yang tunggal (unik)
-                System.out.println("\nSistem Persamaan Linear memiliki balikan dan memiliki solusi yang unik");
+                System.out.println("\nSistem Persamaan Linear memiliki balikan, tidak homogen, dan memiliki solusi yang unik");
                 printsolusisplunik(X);
             }
         }
 
     }
 
-    public void splCramer() {}
+    public void splCramer() {
+        int i, j, k;
+        float det, detMod;
+        boolean homogen = true;
+
+        // Dimisalkan SPL berbentuk AX=B maka dideklarasikan matriks berikut
+        Matriks A = new Matriks(this.BrsEf,this.KolEf-1);
+        Matriks AMod = new Matriks(this.BrsEf,this.KolEf-1);
+        Matriks B = new Matriks(this.BrsEf, 1);
+        float[] X = new float[this.BrsEf];
+
+        // Menyalin elemen ke matriks A
+        for(i=this.GetFirstIdxBrs();i<=this.GetLastIdxBrs();i++){
+            j = A.GetFirstIdxKol();
+            while (j<=A.GetLastIdxKol()) {
+                A.SetElmt(i, j, this.Elmt(i, j)); //eror disini huhuhu :(
+                j++;
+            }
+        }
+
+        // Menyalin elemen ke matriks AMod
+        for(i=this.GetFirstIdxBrs();i<=this.GetLastIdxBrs();i++){
+            for (j = AMod.GetFirstIdxKol(); j<=AMod.GetLastIdxKol(); j++) {
+                A.SetElmt(i, j, this.Elmt(i, j)); //eror disini huhuhu :(
+            }
+        }
+        // Menyalin elemen ke matriks B
+        for(i=this.GetFirstIdxBrs();i<=this.GetLastIdxBrs();i++)
+        {
+            B.SetElmt(i, 0, this.Elmt(i, this.GetLastIdxKol()));
+        }
+
+        // Pengecekan apakah SPL homogen AX=0 atau B=0
+        for (i=B.GetFirstIdxBrs(); i<=B.GetLastIdxBrs(); i++) {
+            if(B.Elmt(i, 0) != 0) {
+                homogen = false;
+                break;
+            }
+        }
+
+        // Menghitung determinan matriks A
+        det = A.Determinan2();
+
+        if (det == 0) {
+            // A tidak punya invers
+            if (homogen) {
+                // SPL memiliki solusi non-trivial
+                System.out.println("\nSistem Persamaan Linear tidak memiliki balikan, homogen, dan memiliki solusi non-trivial");
+                // Menghitung solusi menggunakan metode lain
+                splGauss();
+            }
+            else {
+                // SPL tidak memiliki solusi yang tunggal (unik)
+                System.out.println("\nSistem Persamaan Linear tidak memiliki balikan, tidak homogen, dan tidak memiliki solusi yang unik");
+                splGauss();
+            }
+            // System.out.println("\nSistem Persamaan Linear tidak memiliki penyelesaian.");
+        }
+        else { 
+            // A memiliki invers
+            for (j=A.GetFirstIdxKol(); j<=A.GetLastIdxKol(); j++) {
+                detMod = 0;
+    
+                // Mengganti elemen A kolom j dengan elemen di matriks B
+                for (i=A.GetFirstIdxBrs(); i<=A.GetLastIdxBrs(); i++) {
+                    AMod.SetElmt(i, j, B.Elmt(i, 0));
+                }
+    
+                // Menghitung determinan 
+                detMod = AMod.Determinan2();
+    
+                // Menghitung nilai X
+                X[j] = detMod/det;
+            }
+
+            if (homogen) {
+                // SPL memiliki solusi trivial
+                System.out.println("\nSistem Persamaan Linear memiliki balikan, homogen, dan memiliki solusi trivial");
+                // Menghitung solusi menggunakan metode lain
+                printsolusisplunik(X);
+            }
+            else {
+                // SPL memiliki solusi yang tunggal (unik)
+                System.out.println("\nSistem Persamaan Linear memiliki balikan, tidak homogen, dan memiliki solusi yang unik");
+                printsolusisplunik(X);
+            }
+        }
+
+        for (j=A.GetFirstIdxKol(); j<=A.GetLastIdxKol(); j++) {
+            detMod = 0;
+
+            // Mengganti elemen A kolom j dengan elemen di matriks B
+            for (i=A.GetFirstIdxBrs(); i<=A.GetLastIdxBrs(); i++) {
+                AMod.SetElmt(i, j, B.Elmt(i, 1));
+            }
+
+            // Menghitung determinan 
+            detMod = AMod.Determinan2();
+
+            // Menghitung nilai X
+            X[j] = detMod/det;
+        }
+    }
 
     public Matriks InversMatriks1(){
         // Mendeklarasikan Matriks Aug yang merupakan matriks augmented matriks M dengan matriks satuannya

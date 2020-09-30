@@ -58,6 +58,7 @@ public class MatriksDriver {
                     M.splMatriksBalikan();
                 } else if (pil2==4){
                     // Kaidah Cramer
+                    M.splCramer();
                 }
 
             } else if (pil1==2){
