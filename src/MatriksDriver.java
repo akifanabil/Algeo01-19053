@@ -1,5 +1,4 @@
 import java.util.Scanner;
-
 import javax.swing.JOptionPane;
 
 public class MatriksDriver {
@@ -26,16 +25,17 @@ public class MatriksDriver {
                 } else if (pil1==2 || pil1==3){
                     M.BacaMatriksPersegi();
                 } else if (pil1==4) {
-                    System.out.println("");
                     System.out.println("Petunjuk:");
                     System.out.println("Jumlah baris : derajat + 1");
-                    System.out.println("Jumlah kolom : 2");
-                    System.out.println("");
+                    System.out.println("Jumlah baris : 2");
                     M.BacaMatriks();
+                } else{ //Input Regresi
+                    M.BacaInputRegresi();
                 }
             } else{
                 // Input dibaca dari file
-                M.BacaFileMatriks("matriks.txt");
+                String file = JOptionPane.showInputDialog("Masukkan nama file (dengan .txt): ");
+                M.BacaFileMatriks(file);
             }
 
     
@@ -52,20 +52,12 @@ public class MatriksDriver {
                     M.splGauss();
                 } else if(pil2==2){
                     // Metode eliminasi Gauss-Jordan
-                    M.ForwardPhase();
-                    M.TulisMatriks();
-                    M.LeadingOne();
-                    M.TulisMatriks();
-                    M.BackwardPhase();
-                    M.TulisMatriks();
+                    M.splGaussJordan();
                 } else if (pil2==3){
                     // Metode matriks balikan
                     M.splMatriksBalikan();
                 } else if (pil2==4){
                     // Kaidah Cramer
-                    
-                } else{
-
                 }
 
             } else if (pil1==2){
@@ -89,8 +81,9 @@ public class MatriksDriver {
                 //Melakukan proses pencarian invers matriks berdasarkan pilihan metode
                 if (pil4==1){
                     // Dengan menggunakan metode Gauss Jordan
-                    M.InversMatriks1();
+                    M.printInversMatriks1(M.InversMatriks1());
                 } else if (pil4==2){
+                    // Dengan adjoin dan determinan
                     M.InversMatriks2();
                 }
 
@@ -103,6 +96,7 @@ public class MatriksDriver {
                 //Regresi linear berganda
                 M.regresilinearganda();
             }
+
             MainMenu();
         }
         
