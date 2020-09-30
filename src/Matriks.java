@@ -10,6 +10,7 @@ public class Matriks {
     int KolMin = 0;
     int Tukar = 0;
     boolean nosolutionspl;
+    boolean singular;
     float[][] M;
 
     Scanner scanner = new Scanner(System.in);
@@ -111,21 +112,41 @@ public class Matriks {
             Reader.close();
             
             Reader = new Scanner(f);
-            int nel=0;
-            while (Reader.hasNextFloat()) {
-                nel++;
-                Reader.nextFloat();
+            Scanner Readaline = new Scanner(Reader.nextLine());
+            this.KolEf=0;
+            while (Readaline.hasNextFloat()) {
+                this.KolEf++;
+                Readaline.nextFloat();
             }
-            this.KolEf=nel/this.BrsEf;
+            // this.KolEf=nel/this.BrsEf;
+            Readaline.close();
             Reader.close();
 
-            M = new float [BrsEf][KolEf];
+            // System.out.println(nel);
+            System.out.println(BrsEf);
+            System.out.println(KolEf);
+
+            this.M = new float [this.BrsEf][this.KolEf];
             Reader = new Scanner(f);
-            for (int i=GetFirstIdxBrs();i<=GetLastIdxBrs();i++){
-                for (int j=GetFirstIdxKol();j<=GetLastIdxKol();j++){
-                    SetElmt(i, j, Reader.nextFloat());
+
+            for(int i = 0; i <= BrsEf-1; ++i)
+            {
+                for(int j = 0; j <= KolEf-1;++j)
+                {
+                    SetElmt(i,j,Reader.nextFloat());
                 }
             }
+            // while (Readaline.hasNextLine()) {
+            //     Readaline = new Scanner(Reader.nextLine());
+            //     while (Readaline.hasNextFloat()){
+            //         n = Readaline.nextFloat();
+            //         SetElmt(i, j, n);
+            //         j++;
+            //     }
+            //     i++;
+            //     j=0;
+            // }
+            // this.KolEf=nel/this.BrsEf;
             Reader.close();
         } catch (FileNotFoundException e){
             System.out.println("An error occurred.");
@@ -167,8 +188,9 @@ public class Matriks {
     }
     
     public void ForwardPhase() {
-    	int i, j, k, imax;
-    	float max, faktor, temp;
+    	int i, j, k;
+        float faktor, temp;
+        
     	
     	for (k=GetFirstIdxKol(); k<=GetLastIdxKol(); k++) {
             
@@ -191,9 +213,8 @@ public class Matriks {
     				    SetElmt(i, j, temp);
     			    // SetElmt(i, k, 0);
                     }
-                }
-                else {
-                    TukarBaris(k, i);
+    			} else{
+                    TukarBaris(i,k);
                 }
     		}
     	}
@@ -259,7 +280,7 @@ public class Matriks {
                 System.out.println("\nSistem Persamaan Linear memiliki banyak solusi sebagai berikut : ");
                 printsolusiparametrik(solusi);
             } else{
-                System.out.println("\nSistem Persamaan Linear memiliki sebuah solusi unik.");
+                System.out.println("\nSistem Persamaan Linear memilikisebuah solusi unik.");
                 printsolusisplunik(solusi);
             }
         }
@@ -345,21 +366,19 @@ public class Matriks {
     }
     
     public void LeadingOne(){
-        int i, j, k;
-        float temp, faktor;
+        int i, j=this.GetFirstIdxKol(),k;
+        float pembagi;
 
-        i = GetFirstIdxBrs();
-        j = GetFirstIdxKol();
-        while (i<=GetLastIdxBrs() && j<=GetLastIdxKol()) {
-            faktor = 0;
-            if (Elmt(i, j) != 0) {
-                faktor = Elmt(i, j);
-                for (k=j; k<=GetLastIdxKol(); k++) {
-                    SetElmt(i, k, Elmt(i, k)/faktor);
-                }
-                i++;
+        for (i=this.GetFirstIdxBrs();i<=this.GetLastIdxBrs();i++){
+            while (j<this.GetLastIdxKol() && this.Elmt(i,j)==0){
+                j++;
             }
-            j++;
+            if (this.Elmt(i, j)!=0){
+                pembagi = this.Elmt(i,j);
+                for (k=j;k<=this.GetLastIdxKol();k++){
+                    SetElmt(i,k,this.Elmt(i,k)/pembagi);
+                }
+            }
         }
     }
 
@@ -376,23 +395,22 @@ public class Matriks {
         int i, j, k, l;
         float faktor, temp;
 
-        // Dicek dari baris terakhir
-        i=GetLastIdxBrs();
-        j=GetFirstIdxKol();
-        while (i>GetFirstIdxBrs() && j<=GetLastIdxKol()) {
-            if (Elmt(i, j) != 0) {
+        i=this.GetLastIdxBrs();
+        j=this.GetFirstIdxKol();
+        while (i>=this.GetFirstIdxBrs() && j<=this.GetLastIdxKol()) {
+            if (this.Elmt(i, j) != 0) {
                 // Melakukan reduksi
                 for (k=GetFirstIdxBrs(); k<i; k++) {
-                    faktor = Elmt(k, j)/Elmt(i, j); // udh aman kalau nilai utama udh 1
-                    for (l=j; l<=GetLastIdxKol(); l++) {
-                        temp = Elmt(k, l) - (Elmt(i, l)*faktor);
-                        SetElmt(k, l, temp);
+                    faktor = this.Elmt(k, j)/this.Elmt(i, j); // udh aman kalau nilai utama udh 1
+                    for (l=j; l<=this.GetLastIdxKol(); l++) {
+                        temp = this.Elmt(k, l) - (this.Elmt(i, l)*faktor);
+                        this.SetElmt(k, l, temp);
                     }
                 }
                 i--;
-                j = GetFirstIdxKol();
-            }  
-            else {
+                j=GetFirstIdxKol();
+            } 
+            else{
                 j++;
             }
         }
@@ -409,7 +427,7 @@ public class Matriks {
     }
 
     public void splMatriksBalikan() {
-        int i, j, k; 
+        int i, j; 
         float temp;
         boolean homogen = true;
 
@@ -441,6 +459,8 @@ public class Matriks {
             }
         }
 
+        A.TulisMatriks();
+
         // A^(-1)*A*x = A^(-1)*B maka dicari invers A
         if (A.Determinan2() == 0) {
             // A tidak punya invers
@@ -457,16 +477,17 @@ public class Matriks {
             }
             // System.out.println("\nSistem Persamaan Linear tidak memiliki penyelesaian.");
         }
-        else { // A memiliki invers
-            A.InversMatriks1();
+        else { 
+            // A memiliki invers
+            A=InversMatriks1();
             // Perkalian invers A dengan B
             for (i=A.GetFirstIdxBrs(); i<=A.GetLastIdxBrs(); i++) {
                 temp = 0;
-                for (j=A.GetFirstIdxKol(); j<A.GetLastIdxKol(); j++) {
+                for (j=A.GetFirstIdxKol(); j<=A.GetLastIdxKol(); j++) {
                     temp += A.Elmt(i, j) * B.Elmt(j, 0);
                 }
                 // X.SetElmt(j, 1, temp);
-                X[j] = temp;
+                X[i] = temp;
             }
             if (homogen) {
                 // SPL memiliki solusi trivial
@@ -485,9 +506,9 @@ public class Matriks {
 
     public void splCramer() {}
 
-    public void InversMatriks1(){
+    public Matriks InversMatriks1(){
         // Mendeklarasikan Matriks Aug yang merupakan matriks augmented matriks M dengan matriks satuannya
-        Matriks Aug = new Matriks(this.BrsEf,this.KolEf+this.BrsEf);
+        Matriks Aug = new Matriks(this.BrsEf,2*this.BrsEf);
         
         // Membentuk Matriks Augmented dari Matriks M dengan matriks satuannya
 
@@ -503,23 +524,20 @@ public class Matriks {
         // Menambah elemen elemen matriks satuan
         for(i=GetFirstIdxBrs();i<=GetLastIdxBrs();i++)
         {
-            for (j=this.GetLastIdxKol()+1;j<=Aug.GetLastIdxKol();j++)
+            for (j=Aug.GetLastIdxBrs()+1;j<=Aug.GetLastIdxKol();j++)
             {
-                if (i==j-KolEf){
+                if (i==j-Aug.BrsEf){
                     Aug.SetElmt(i, j, 1);
                 } else{
                     Aug.SetElmt(i, j, 0);
                 }
             }
         }
-        // Aug.TulisMatriks();
-
         //Melakukan operasi OBE dengan metode Gauss-Jordan
         Aug.ForwardPhase();
+        Aug.LeadingOne();
         Aug.BackwardPhase();
 
-        // Aug.TulisMatriks();
-        //Ambil matriks dri kolom this.getlastkol()+1 sampe Aug.getlastkol()
         Matriks Invers = new Matriks(Aug.GetLastIdxBrs()+1,Aug.GetLastIdxBrs()+1);
         if (Aug.Elmt(Aug.GetLastIdxBrs(),Aug.GetLastIdxBrs()) == 1){
             // Punya invers
@@ -528,10 +546,20 @@ public class Matriks {
                     Invers.SetElmt(i, j-Aug.GetLastIdxBrs()-1, Aug.Elmt(i, j));
                 }
             }
+        } else{
+            //Tidak punya invers (hanya mengembalikan matriks kosong)
+            singular=true;   
+        }
+        return Invers;
+    }
+
+    public void printInversMatriks1(Matriks Invers){
+        // Ambil matriks dri kolom this.getlastkol()+1 sampe Aug.getlastkol()
+        if (!singular){
             Invers.TulisMatriks();
         } else{
             // Tidak punya invers
-            System.out.println("Matriks tidak memiliki invers");
+            System.out.println("\nMatriks tidak memiliki invers");
         }
     }
 
@@ -622,7 +650,6 @@ public class Matriks {
                 im=GetFirstIdxBrs();
             }
         }
-        Kofaktor.TulisMatriks();
 
         // Membuat matriks invers dari pembagian matriks adjoin dengan determinan matriks
         Matriks Adjoin = new Matriks(this.BrsEf,this.KolEf);
@@ -639,7 +666,7 @@ public class Matriks {
             }
             Invers.TulisMatriks();
         } else{
-            System.out.println("Matriks tidak memiliki invers.");
+            System.out.println("\nMatriks tidak memiliki invers.");
         }
     }
 
@@ -659,7 +686,6 @@ public class Matriks {
     public void Interpolasi() {
         // Mencari polinom interpolasi derajat n
         float Taksir=0;
-        System.out.println("");
         System.out.print("Masukkan derajat polinom interpolasi : ");
         int N = scanner.nextInt();
 
@@ -686,156 +712,127 @@ public class Matriks {
         }
 
         // Mencari dan menampilkan koefisien persamaan
-        float[] solusi;
-        Persamaan.ForwardPhase();
-        Persamaan.LeadingOne();
-        Persamaan.BackwardPhase();
-        solusi = Persamaan.BackSubs();
-        for (int i=0;i<solusi.length;i++){
-            System.out.printf("a%d = %.4f\n", i, solusi[i]);
-        }
+        Persamaan.splGaussJordan();
 
         // Menampilkan polinom interpolasi
-        System.out.print("p" + N + "(x) = ");
-        for (int i=0;i<solusi.length;i++){
+        for (int i=Persamaan.GetFirstIdxBrs();i<=Persamaan.GetLastIdxBrs();i++) {
             if (i==0) {
-                if (solusi[i]!=0) {
-                    System.out.printf("%.4f", solusi[i]);
+                System.out.print("p" + N + "(x) = ");
+                if (Persamaan.Elmt(i,Persamaan.GetLastIdxKol())!=0) {
+                    System.out.print(Persamaan.Elmt(i,Persamaan.GetLastIdxKol()));
                 }
             }
             else if (i==1) {
-                if (solusi[i]>0) {
-                    System.out.printf(" + %.4fx", solusi[i]);
+                if (Persamaan.Elmt(i,Persamaan.GetLastIdxKol())>0) {
+                    System.out.print(" + " + Persamaan.Elmt(i,Persamaan.GetLastIdxKol()) + "x");
                 }
-                else if (solusi[i]<0) {
-                    System.out.printf(" - %.4fx", Math.abs(solusi[i]));
+                else if (Persamaan.Elmt(i,Persamaan.GetLastIdxKol())<0) {
+                    System.out.print(" - " + Math.abs(Persamaan.Elmt(i,Persamaan.GetLastIdxKol())) + "x");
                 }
             }
             else {
-                if (solusi[i]>0) {
-                    System.out.printf(" + %.4fx^%d", solusi[i], i);
+                if (Persamaan.Elmt(i,Persamaan.GetLastIdxKol())>0) {
+                    System.out.print(" + " + Persamaan.Elmt(i,Persamaan.GetLastIdxKol()) + "x^" + i);
                 }
-                else if (solusi[i]<0) {
-                    System.out.printf(" - %.4fx^%d", Math.abs(solusi[i]), i);
+                else if (Persamaan.Elmt(i,Persamaan.GetLastIdxKol())<0) {
+                    System.out.print(" - " + Math.abs(Persamaan.Elmt(i,Persamaan.GetLastIdxKol())) + "x^" + i);
                 }
             }
         }
-        System.out.println("");
         System.out.println("");
 
         // Menerima nilai X yang ingin ditaksir
         System.out.print("Masukkan nilai X yang ingin ditaksir : ");
         Float X = scanner.nextFloat();
-        System.out.println("");
 
-        // Menanghitung hasil taksiran
-        for (int i=0;i<solusi.length;i++) {
-            Taksir += (solusi[i]*(Math.pow(X,i)));
+        // Menampilkan hasil taksiran
+        for (int i=Persamaan.GetFirstIdxBrs();i<Persamaan.GetLastIdxBrs();i++) {
+            Taksir += (Persamaan.Elmt(i,Persamaan.GetLastIdxKol())*(Math.pow(X,i)));
         }
-
-        //Menampilkan hasil taksiran
-        System.out.println("Hasil taksiran polinom interpolasi yaitu : ");
-
-        System.out.print("p" + N + "(" + X + ") = ");
-        for (int i=0;i<solusi.length;i++){
-            if (i==0) {
-                if (solusi[i]!=0) {
-                    System.out.printf("%.4f", solusi[i]);
-                }
-            }
-            else if (i==1) {
-                if (solusi[i]>0) {
-                    System.out.printf(" + %.4f", solusi[i]);
-                    System.out.print("(" + X + ")");
-                }
-                else if (solusi[i]<0) {
-                    System.out.printf(" - %.4f", Math.abs(solusi[i]));
-                    System.out.print("(" + X + ")");
-                }
-            }
-            else {
-                if (solusi[i]>0) {
-                    System.out.printf(" + %.4f", solusi[i]);
-                    System.out.print("(" + X + ")" + "^" + i);
-                }
-                else if (solusi[i]<0) {
-                    System.out.printf(" - %.4f", Math.abs(solusi[i]));
-                    System.out.print("(" + X + ")" + "^" + i);
-                }
-            }
-        }
-        System.out.printf(" = %.4f", Taksir);
+        System.out.println("Hasil taksiran polinom interpolasi yaitu : " + Taksir);
     }
-    
-    public void regresilinearganda(){
+
+    public void BacaInputRegresi(){
         //Membaca banyak elemen variabel independen x
         System.out.println("Input nilai variabel peubah x dan variabel terkait y");
         System.out.print("Masukkan banyak variabel peubah x : ");
         int N = scanner.nextInt();
-        Matriks xy = new Matriks(N,N+1);
-        for (int i=xy.GetFirstIdxBrs();i<=xy.GetLastIdxBrs();i++){
-            for (int j=xy.GetFirstIdxKol();j<xy.GetLastIdxKol();j++){
+        KolEf = N+1;
+        System.out.print("Masukkan banyak data yang ingin diinput : ");
+        BrsEf = scanner.nextInt();
+
+
+        // Membuat sebuah matriks xy dan mengisi nilai sesuai masukan user
+        M = new float [BrsEf][KolEf];
+        for (int i=this.GetFirstIdxBrs();i<=this.GetLastIdxBrs();i++){
+            for (int j=this.GetFirstIdxKol();j<this.GetLastIdxKol();j++){
                 System.out.print("Masukkan nilai x"+(j+1)+(i+1)+" : ");
-                xy.SetElmt(i, j, scanner.nextFloat());
+                SetElmt(i, j, scanner.nextFloat());
             }
             System.out.print("Masukkan nilai y"+(i+1)+"  : ");
-            xy.SetElmt(i, xy.GetLastIdxKol(), scanner.nextFloat());
+            SetElmt(i, this.GetLastIdxKol(), scanner.nextFloat());
         }
+    }
+    
+    public void regresilinearganda(){
 
-
-        Matriks splxy = new Matriks(N+1,N+2);
+        // Membuat matriks sesuai persamaan SPL untuk regresi linear ganda
+        Matriks splxy = new Matriks(KolEf,KolEf+1);
 
         // Set elemen baris pertama kolom pertama dengan N
-        splxy.SetElmt(splxy.GetFirstIdxBrs(), splxy.GetFirstIdxKol(), N);
+        splxy.SetElmt(splxy.GetFirstIdxBrs(), splxy.GetFirstIdxKol(), BrsEf);
 
         // Set elemen baris pertama kolom kedua hingga akhir dan kolom pertama baris kedua hingga akhir
         for (int i=splxy.GetFirstIdxKol()+1;i<=splxy.GetLastIdxKol();i++){
             float sum = 0;
-            for (int j=xy.GetFirstIdxBrs();j<=xy.GetLastIdxBrs();j++){
-                sum+=xy.Elmt(j, i-1);
+            for (int j=GetFirstIdxBrs();j<=GetLastIdxBrs();j++){
+                sum+=Elmt(j, i-1);
             }
             splxy.SetElmt(splxy.GetFirstIdxBrs(), i, sum);
             if (i<=splxy.GetLastIdxBrs()){
-                splxy.SetElmt(i, GetFirstIdxKol(), sum);
+                splxy.SetElmt(i, splxy.GetFirstIdxKol(), sum);
             }
         }
 
-        // Set elemen mulai baris kedua dan kolom kedua hingga akhir
+        // Set elemen tersisa yg belum diisi
         for (int i=splxy.GetFirstIdxBrs()+1;i<=splxy.GetLastIdxBrs();i++){
             for (int j=splxy.GetFirstIdxKol()+1;j<=splxy.GetLastIdxKol();j++){
                 float sum = 0;
-                for (int k=xy.GetFirstIdxBrs();k<=xy.GetLastIdxBrs();k++){
-                    sum+=xy.Elmt(k, i-1)*xy.Elmt(k, j-1);
+                for (int k=GetFirstIdxBrs();k<=GetLastIdxBrs();k++){
+                    sum+=Elmt(k, i-1)*Elmt(k, j-1);
                 }
                 splxy.SetElmt(i, j, sum);
             }
         }
 
+
+        //Melakukan penyelesaian spl dengan metode gauss
+        splxy.ForwardPhase();
+        splxy.LeadingOne();
+        float[] hasilspl=splxy.BackSubs();
+
         // Meminta input xk yaitu nilai nilai x yang ingin ditaksir nilai fungsinya
-        Matriks xk = new Matriks(1,N);
+        Matriks xk = new Matriks(1,KolEf-1);
         System.out.println("\nInput nilai-nilai x yang ingin ditaksir nilai fungsinya");
         for (int j=xk.GetFirstIdxKol();j<=xk.GetLastIdxKol();j++){
             System.out.print("Masukkan nilai x"+(j+1)+" : ");
             xk.SetElmt(xk.GetFirstIdxBrs(), j, scanner.nextFloat());
         }
 
-        xk.TulisMatriks();
-
-        //Melakukan penyelesaian spl dengan metode gauss
-
-
-        Matriks hasilspl = new Matriks(1,N+1);
-
-        System.out.println("\nPersamaan umum regresi linear: \nyi =");
-        for (int i=splxy.GetFirstIdxBrs();i<splxy.GetLastIdxBrs();i++){
-            System.out.println(/*elemen matriks penyelesaian splxy*/);
+        System.out.print("\nPersamaan regresi linear: \nyi ="+hasilspl[0]);
+        for (int i=1;i<hasilspl.length;i++){
+            if (hasilspl[i]>0){
+                System.out.print(" + "+hasilspl[i]+"x"+(i+1));
+            } else{
+                System.out.print(" - "+(-1 * hasilspl[i])+"x"+(i+1));
+            }
         }
 
         // Menuliskan hasil taksiran fungsi
-        System.out.println("\nHasil taksiran fungsi : ");
-        float sum=hasilspl.Elmt(hasilspl.GetFirstIdxBrs(), hasilspl.GetFirstIdxKol());
-        for (int i=hasilspl.GetFirstIdxKol()+1;i<=GetLastIdxKol();i++){
-            sum+=hasilspl.Elmt(hasilspl.GetFirstIdxBrs(), i)*xk.Elmt(xk.GetFirstIdxBrs(), i-1);
+        System.out.print("\nHasil taksiran fungsi : \n");
+        float sum=hasilspl[0];
+        for (int i=1;i<hasilspl.length;i++){
+            sum+=hasilspl[i]*xk.Elmt(xk.GetFirstIdxBrs(), i-1);
         }
         System.out.println(sum);
     }
