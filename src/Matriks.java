@@ -341,13 +341,16 @@ public class Matriks {
     
     public void LeadingOne(){
         int i, j, k;
+        float temp, faktor;
 
         i = GetFirstIdxBrs();
         j = GetFirstIdxKol();
         while (i<=GetLastIdxBrs() && j<=GetLastIdxKol()) {
+            faktor = 0;
             if (Elmt(i, j) != 0) {
-                for (k=GetFirstIdxKol(); k<=GetLastIdxKol(); k++) {
-                    SetElmt(i, k, Elmt(i, k)/Elmt(i, j));
+                faktor = Elmt(i, j);
+                for (k=j; k<=GetLastIdxKol(); k++) {
+                    SetElmt(i, k, Elmt(i, k)/faktor);
                 }
                 i++;
             }
