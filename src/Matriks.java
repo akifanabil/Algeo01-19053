@@ -254,7 +254,7 @@ public class Matriks {
                 System.out.println("\nSistem Persamaan Linear memiliki banyak solusi sebagai berikut : ");
                 printsolusiparametrik(solusi);
             } else{
-                System.out.println("\nSistem Persamaan Linear memilikisebuah solusi unik.");
+                System.out.println("\nSistem Persamaan Linear memiliki sebuah solusi unik.");
                 printsolusisplunik(solusi);
             }
         }
@@ -579,6 +579,7 @@ public class Matriks {
     public void Interpolasi() {
         // Mencari polinom interpolasi derajat n
         float Taksir=0;
+        System.out.println("");
         System.out.print("Masukkan derajat polinom interpolasi : ");
         int N = scanner.nextInt();
 
@@ -605,44 +606,85 @@ public class Matriks {
         }
 
         // Mencari dan menampilkan koefisien persamaan
-        Persamaan.splGaussJordan();
+        float[] solusi;
+        Persamaan.ForwardPhase();
+        Persamaan.LeadingOne();
+        Persamaan.BackwardPhase();
+        solusi = Persamaan.BackSubs();
+        for (int i=0;i<solusi.length;i++){
+            System.out.printf("a%d = %.4f\n", i, solusi[i]);
+        }
 
         // Menampilkan polinom interpolasi
-        for (int i=Persamaan.GetFirstIdxBrs();i<=Persamaan.GetLastIdxBrs();i++) {
+        System.out.print("p" + N + "(x) = ");
+        for (int i=0;i<solusi.length;i++){
             if (i==0) {
-                System.out.print("p" + N + "(x) = ");
-                if (Persamaan.Elmt(i,Persamaan.GetLastIdxKol())!=0) {
-                    System.out.print(Persamaan.Elmt(i,Persamaan.GetLastIdxKol()));
+                if (solusi[i]!=0) {
+                    System.out.printf("%.4f", solusi[i]);
                 }
             }
             else if (i==1) {
-                if (Persamaan.Elmt(i,Persamaan.GetLastIdxKol())>0) {
-                    System.out.print(" + " + Persamaan.Elmt(i,Persamaan.GetLastIdxKol()) + "x");
+                if (solusi[i]>0) {
+                    System.out.printf(" + %.4fx", solusi[i]);
                 }
-                else if (Persamaan.Elmt(i,Persamaan.GetLastIdxKol())<0) {
-                    System.out.print(" - " + Math.abs(Persamaan.Elmt(i,Persamaan.GetLastIdxKol())) + "x");
+                else if (solusi[i]<0) {
+                    System.out.printf(" - %.4fx", Math.abs(solusi[i]));
                 }
             }
             else {
-                if (Persamaan.Elmt(i,Persamaan.GetLastIdxKol())>0) {
-                    System.out.print(" + " + Persamaan.Elmt(i,Persamaan.GetLastIdxKol()) + "x^" + i);
+                if (solusi[i]>0) {
+                    System.out.printf(" + %.4fx^%d", solusi[i], i);
                 }
-                else if (Persamaan.Elmt(i,Persamaan.GetLastIdxKol())<0) {
-                    System.out.print(" - " + Math.abs(Persamaan.Elmt(i,Persamaan.GetLastIdxKol())) + "x^" + i);
+                else if (solusi[i]<0) {
+                    System.out.printf(" - %.4fx^%d", Math.abs(solusi[i]), i);
                 }
             }
         }
+        System.out.println("");
         System.out.println("");
 
         // Menerima nilai X yang ingin ditaksir
         System.out.print("Masukkan nilai X yang ingin ditaksir : ");
         Float X = scanner.nextFloat();
+        System.out.println("");
 
-        // Menampilkan hasil taksiran
-        for (int i=Persamaan.GetFirstIdxBrs();i<Persamaan.GetLastIdxBrs();i++) {
-            Taksir += (Persamaan.Elmt(i,Persamaan.GetLastIdxKol())*(Math.pow(X,i)));
+        // Menanghitung hasil taksiran
+        for (int i=0;i<solusi.length;i++) {
+            Taksir += (solusi[i]*(Math.pow(X,i)));
         }
-        System.out.println("Hasil taksiran polinom interpolasi yaitu : " + Taksir);
+
+        //Menampilkan hasil taksiran
+        System.out.println("Hasil taksiran polinom interpolasi yaitu : ");
+
+        System.out.print("p" + N + "(" + X + ") = ");
+        for (int i=0;i<solusi.length;i++){
+            if (i==0) {
+                if (solusi[i]!=0) {
+                    System.out.printf("%.4f", solusi[i]);
+                }
+            }
+            else if (i==1) {
+                if (solusi[i]>0) {
+                    System.out.printf(" + %.4f", solusi[i]);
+                    System.out.print("(" + X + ")");
+                }
+                else if (solusi[i]<0) {
+                    System.out.printf(" - %.4f", Math.abs(solusi[i]));
+                    System.out.print("(" + X + ")");
+                }
+            }
+            else {
+                if (solusi[i]>0) {
+                    System.out.printf(" + %.4f", solusi[i]);
+                    System.out.print("(" + X + ")" + "^" + i);
+                }
+                else if (solusi[i]<0) {
+                    System.out.printf(" - %.4f", Math.abs(solusi[i]));
+                    System.out.print("(" + X + ")" + "^" + i);
+                }
+            }
+        }
+        System.out.printf(" = %.4f", Taksir);
     }
     
     public void regresilinearganda(){

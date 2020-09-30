@@ -26,9 +26,11 @@ public class MatriksDriver {
                 } else if (pil1==2 || pil1==3){
                     M.BacaMatriksPersegi();
                 } else if (pil1==4) {
+                    System.out.println("");
                     System.out.println("Petunjuk:");
                     System.out.println("Jumlah baris : derajat + 1");
-                    System.out.println("Jumlah baris : 2");
+                    System.out.println("Jumlah kolom : 2");
+                    System.out.println("");
                     M.BacaMatriks();
                 }
             } else{
