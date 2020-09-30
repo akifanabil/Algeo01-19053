@@ -53,7 +53,9 @@ public class MatriksDriver {
                 } else if(pil2==2){
                     // Metode eliminasi Gauss-Jordan
                     M.ForwardPhase();
+                    M.TulisMatriks();
                     M.LeadingOne();
+                    M.TulisMatriks();
                     M.BackwardPhase();
                     M.TulisMatriks();
                 } else if (pil2==3){

@@ -191,7 +191,10 @@ public class Matriks {
     				    SetElmt(i, j, temp);
     			    // SetElmt(i, k, 0);
                     }
-    			}
+                }
+                else {
+                    TukarBaris(k, i);
+                }
     		}
     	}
     }
@@ -406,7 +409,79 @@ public class Matriks {
     }
 
     public void splMatriksBalikan() {
-        
+        int i, j, k; 
+        float temp;
+        boolean homogen = true;
+
+        // Dimisalkan SPL berbentuk AX=B maka dideklarasikan matriks berikut
+        Matriks A = new Matriks(GetLastIdxBrs(), GetLastIdxKol()-1);
+        Matriks B = new Matriks(GetLastIdxBrs(), 1);
+        float[] X = new float[GetLastIdxBrs()];
+
+        // Menyalin elemen ke matriks A
+        for(i=this.GetFirstIdxBrs();i<=this.GetLastIdxBrs();i++)
+        {
+            j = A.GetFirstIdxKol();
+            while (j<=A.GetLastIdxKol()) {
+                A.SetElmt(i, j, this.Elmt(i, j));
+                j++;
+            }
+        }
+
+        // Menyalin elemen ke matriks B
+        for(i=this.GetFirstIdxBrs();i<=this.GetLastIdxBrs();i++)
+        {
+            B.SetElmt(i, 1, this.Elmt(i, this.GetLastIdxKol()));
+        }
+
+        // Pengecekan apakah SPL homogen AX=0 atau B=0
+        for (i=B.GetFirstIdxBrs(); i<=B.GetLastIdxBrs(); i++) {
+            if(B.Elmt(i, 1) != 0) {
+                homogen = false;
+                break;
+            }
+        }
+
+        // A^(-1)*A*x = A^(-1)*B maka dicari invers A
+        A.InversMatriks1();
+        if (A.Determinan1() == 0) {
+            // A tidak punya invers
+            if (homogen) {
+                // SPL memiliki solusi non-trivial
+                System.out.println("\nSistem Persamaan Linear tidak memiliki balikan dan memiliki solusi non-trivial");
+                // Menghitung solusi menggunakan metode lain
+                splGauss();
+            }
+            else {
+                // SPL tidak memiliki solusi yang tunggal (unik)
+                System.out.println("\nSistem Persamaan Linear tidak memiliki balikan dan tidak memiliki solusi yang unik");
+                splGauss();
+            }
+            // System.out.println("\nSistem Persamaan Linear tidak memiliki penyelesaian.");
+        }
+        else { // A memiliki invers
+            // Perkalian invers A dengan B
+            for (i=A.GetFirstIdxBrs(); i<=A.GetLastIdxBrs(); i++) {
+                temp = 0;
+                for (j=A.GetFirstIdxKol(); j<=A.GetLastIdxKol(); j++) {
+                    temp += A.Elmt(i, j) * B.Elmt(j, 1);
+                }
+                // X.SetElmt(j, 1, temp);
+                X[j] = temp;
+            }
+            if (homogen) {
+                // SPL memiliki solusi trivial
+                System.out.println("\nSistem Persamaan Linear memiliki balikan dan memiliki solusi trivial");
+                // Menghitung solusi menggunakan metode lain
+                printsolusisplunik(X);
+            }
+            else {
+                // SPL memiliki solusi yang tunggal (unik)
+                System.out.println("\nSistem Persamaan Linear memiliki balikan dan memiliki solusi yang unik");
+                printsolusisplunik(X);
+            }
+        }
+
     }
 
     public void splCramer() {}
