@@ -371,21 +371,25 @@ public class Matriks {
         int i, j, k, l;
         float faktor, temp;
 
+        // Dicek dari baris terakhir
         i=GetLastIdxBrs();
         j=GetFirstIdxKol();
-        while (i>=GetFirstIdxBrs() && j<=GetLastIdxKol()) {
+        while (i>GetFirstIdxBrs() && j<=GetLastIdxKol()) {
             if (Elmt(i, j) != 0) {
                 // Melakukan reduksi
-                for (k=i-1; k>=GetFirstIdxBrs(); k--) {
+                for (k=GetFirstIdxBrs(); k<i; k++) {
                     faktor = Elmt(k, j)/Elmt(i, j); // udh aman kalau nilai utama udh 1
-                    for (l=GetFirstIdxKol(); l<=GetLastIdxKol(); l++) {
+                    for (l=j; l<=GetLastIdxKol(); l++) {
                         temp = Elmt(k, l) - (Elmt(i, l)*faktor);
                         SetElmt(k, l, temp);
                     }
                 }
                 i--;
+                j = GetFirstIdxKol();
             }  
-            j++;
+            else {
+                j++;
+            }
         }
     }
 
