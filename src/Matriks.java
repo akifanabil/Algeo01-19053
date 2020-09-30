@@ -414,37 +414,35 @@ public class Matriks {
         boolean homogen = true;
 
         // Dimisalkan SPL berbentuk AX=B maka dideklarasikan matriks berikut
-        Matriks A = new Matriks(GetLastIdxBrs(), GetLastIdxKol()-1);
-        Matriks B = new Matriks(GetLastIdxBrs(), 1);
-        float[] X = new float[GetLastIdxBrs()];
+        Matriks A = new Matriks(this.BrsEf,this.KolEf-1);
+        Matriks B = new Matriks(this.BrsEf, 1);
+        float[] X = new float[this.BrsEf];
 
         // Menyalin elemen ke matriks A
-        for(i=this.GetFirstIdxBrs();i<=this.GetLastIdxBrs();i++)
+        for(i=A.GetFirstIdxBrs();i<=A.GetLastIdxBrs();i++)
         {
-            j = A.GetFirstIdxKol();
-            while (j<=A.GetLastIdxKol()) {
+            for (j=A.GetFirstIdxKol();j<=A.GetLastIdxKol();j++)
+            {
                 A.SetElmt(i, j, this.Elmt(i, j));
-                j++;
             }
         }
 
         // Menyalin elemen ke matriks B
         for(i=this.GetFirstIdxBrs();i<=this.GetLastIdxBrs();i++)
         {
-            B.SetElmt(i, 1, this.Elmt(i, this.GetLastIdxKol()));
+            B.SetElmt(i, 0, this.Elmt(i, this.GetLastIdxKol()));
         }
 
         // Pengecekan apakah SPL homogen AX=0 atau B=0
         for (i=B.GetFirstIdxBrs(); i<=B.GetLastIdxBrs(); i++) {
-            if(B.Elmt(i, 1) != 0) {
+            if(B.Elmt(i, 0) != 0) {
                 homogen = false;
                 break;
             }
         }
 
         // A^(-1)*A*x = A^(-1)*B maka dicari invers A
-        A.InversMatriks1();
-        if (A.Determinan1() == 0) {
+        if (A.Determinan2() == 0) {
             // A tidak punya invers
             if (homogen) {
                 // SPL memiliki solusi non-trivial
@@ -460,11 +458,12 @@ public class Matriks {
             // System.out.println("\nSistem Persamaan Linear tidak memiliki penyelesaian.");
         }
         else { // A memiliki invers
+            A.InversMatriks1();
             // Perkalian invers A dengan B
             for (i=A.GetFirstIdxBrs(); i<=A.GetLastIdxBrs(); i++) {
                 temp = 0;
-                for (j=A.GetFirstIdxKol(); j<=A.GetLastIdxKol(); j++) {
-                    temp += A.Elmt(i, j) * B.Elmt(j, 1);
+                for (j=A.GetFirstIdxKol(); j<A.GetLastIdxKol(); j++) {
+                    temp += A.Elmt(i, j) * B.Elmt(j, 0);
                 }
                 // X.SetElmt(j, 1, temp);
                 X[j] = temp;
