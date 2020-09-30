@@ -184,11 +184,13 @@ public class Matriks {
     		
     		// Melakukan reduksi
     		for (i=k+1; i<=GetLastIdxBrs(); i++) {
-    			faktor = Elmt(i, k)/Elmt(k, k);
-    			for (j=GetFirstIdxKol(); j<=GetLastIdxKol(); j++) {
-    				temp = Elmt(i, j) - (Elmt(k, j) * faktor);
-    				SetElmt(i, j, temp);
-    			// SetElmt(i, k, 0);
+                if (Elmt(k, k)!=0) {
+                    faktor = Elmt(i, k)/Elmt(k, k);
+    			    for (j=GetFirstIdxKol(); j<=GetLastIdxKol(); j++) {
+    				    temp = Elmt(i, j) - (Elmt(k, j) * faktor);
+    				    SetElmt(i, j, temp);
+    			    // SetElmt(i, k, 0);
+                    }
     			}
     		}
     	}
