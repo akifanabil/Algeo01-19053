@@ -445,18 +445,14 @@ public class Matriks {
         float[] X = new float[this.BrsEf];
 
         // Menyalin elemen ke matriks A
-        for(i=A.GetFirstIdxBrs();i<=A.GetLastIdxBrs();i++)
-        {
-            for (j=A.GetFirstIdxKol();j<=A.GetLastIdxKol();j++)
-            {
+        for(i=A.GetFirstIdxBrs();i<=A.GetLastIdxBrs();i++) {
+            for (j=A.GetFirstIdxKol();j<=A.GetLastIdxKol();j++) {
                 A.SetElmt(i, j, this.Elmt(i, j));
             }
         }
-        A.TulisMatriks();
 
         // Menyalin elemen ke matriks B
-        for(i=this.GetFirstIdxBrs();i<=this.GetLastIdxBrs();i++)
-        {
+        for(i=this.GetFirstIdxBrs();i<=this.GetLastIdxBrs();i++) {
             B.SetElmt(i, 0, this.Elmt(i, this.GetLastIdxKol()));
         }
 
@@ -526,23 +522,21 @@ public class Matriks {
         float[] X = new float[this.BrsEf];
 
         // Menyalin elemen ke matriks A
-        for(i=this.GetFirstIdxBrs();i<=this.GetLastIdxBrs();i++){
-            j = A.GetFirstIdxKol();
-            while (j<=A.GetLastIdxKol()) {
-                A.SetElmt(i, j, this.Elmt(i, j)); //eror disini huhuhu :(
-                j++;
+        for(i=A.GetFirstIdxBrs();i<=A.GetLastIdxBrs();i++) {
+            for (j=A.GetFirstIdxKol();j<=A.GetLastIdxKol();j++) {
+                A.SetElmt(i, j, this.Elmt(i, j));
             }
         }
 
         // Menyalin elemen ke matriks AMod
-        for(i=this.GetFirstIdxBrs();i<=this.GetLastIdxBrs();i++){
+        for(i=AMod.GetFirstIdxBrs();i<=AMod.GetLastIdxBrs();i++){
             for (j = AMod.GetFirstIdxKol(); j<=AMod.GetLastIdxKol(); j++) {
-                A.SetElmt(i, j, this.Elmt(i, j)); //eror disini huhuhu :(
+                AMod.SetElmt(i, j, this.Elmt(i, j)); //eror disini huhuhu :(
             }
         }
+
         // Menyalin elemen ke matriks B
-        for(i=this.GetFirstIdxBrs();i<=this.GetLastIdxBrs();i++)
-        {
+        for(i=this.GetFirstIdxBrs();i<=this.GetLastIdxBrs();i++) {
             B.SetElmt(i, 0, this.Elmt(i, this.GetLastIdxKol()));
         }
 
@@ -586,7 +580,19 @@ public class Matriks {
                 detMod = AMod.Determinan2();
     
                 // Menghitung nilai X
-                X[j] = detMod/det;
+                if (detMod!= 0) {
+                    X[j] = detMod/det;
+                }
+                else {
+                    X[j] = 0;
+                }
+
+                // Menyalin elemen ke matriks AMod
+                for(i=AMod.GetFirstIdxBrs();i<=AMod.GetLastIdxBrs();i++){
+                    for (k = AMod.GetFirstIdxKol(); k<=AMod.GetLastIdxKol(); k++) {
+                        AMod.SetElmt(i, k, this.Elmt(i, k)); //eror disini huhuhu :(
+                    }
+                }
             }
 
             if (homogen) {
@@ -607,7 +613,7 @@ public class Matriks {
 
             // Mengganti elemen A kolom j dengan elemen di matriks B
             for (i=A.GetFirstIdxBrs(); i<=A.GetLastIdxBrs(); i++) {
-                AMod.SetElmt(i, j, B.Elmt(i, 1));
+                AMod.SetElmt(i, j, B.Elmt(i, 0));
             }
 
             // Menghitung determinan 
