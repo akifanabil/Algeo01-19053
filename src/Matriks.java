@@ -188,35 +188,43 @@ public class Matriks {
     }
     
     public void ForwardPhase() {
-    	int i, j, k;
+    	int i=GetFirstIdxBrs(),j, k;
         float faktor, temp;
+        boolean foundnot0;
         
     	
-    	for (k=GetFirstIdxKol(); k<=GetLastIdxKol(); k++) {
-            
-            // Menukar baris jika elemen pertama adalah 0
-            if (Elmt(GetFirstIdxBrs(), GetFirstIdxKol()) == 0) {
-                i = GetFirstIdxBrs()+1;
-                while (Elmt(i, GetFirstIdxKol()) == 0 ) {
+    	for (k=this.GetFirstIdxKol(); k<this.GetLastIdxKol(); k++) {
+            if (i<=this.GetLastIdxBrs()){
+                // Menukar baris jika elemen pertama adalah 0
+                foundnot0 = true;
+                if (this.Elmt(i, k) == 0) {
+                    foundnot0=false;
+                    j=i+1;
+                    while (j<=this.GetLastIdxBrs() && !foundnot0){
+                        if (this.Elmt(j, k)!=0){
+                            foundnot0=true;
+                        } else{
+                            j++;
+                        }
+                    }
+                    if (foundnot0){
+                        this.TukarBaris(i, j);
+                        Tukar++;
+                    }
+                }
+                
+                if (foundnot0){ //Melakukan reduksi
+                    for (j=i+1; j<=this.GetLastIdxBrs(); j++) {
+                        faktor = this.Elmt(j, k)/this.Elmt(i, k);
+                        for (int l=this.GetFirstIdxKol(); l<=this.GetLastIdxKol(); l++) {
+                            // SetElmt(i, k, 0);
+                            temp = this.Elmt(j, l) - (this.Elmt(i, l) * faktor);
+                            this.SetElmt(j, l, temp);
+                        }
+                    }
                     i++;
                 }
-                TukarBaris(GetFirstIdxBrs(), i);
-                Tukar++;
             }
-    		
-    		// Melakukan reduksi
-    		for (i=k+1; i<=GetLastIdxBrs(); i++) {
-                if (Elmt(k, k)!=0) {
-                    faktor = Elmt(i, k)/Elmt(k, k);
-    			    for (j=GetFirstIdxKol(); j<=GetLastIdxKol(); j++) {
-    				    temp = Elmt(i, j) - (Elmt(k, j) * faktor);
-    				    SetElmt(i, j, temp);
-    			    // SetElmt(i, k, 0);
-                    }
-    			} else{
-                    TukarBaris(i,k);
-                }
-    		}
     	}
     }
     
