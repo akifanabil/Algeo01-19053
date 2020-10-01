@@ -2,6 +2,9 @@ import java.util.Scanner;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.lang.Math;
+import java.text.DecimalFormat;
+import java.math.BigDecimal;
+import java.math.RoundingMode; 
 
 public class Matriks {
 
@@ -219,7 +222,7 @@ public class Matriks {
                         for (int l=this.GetFirstIdxKol(); l<=this.GetLastIdxKol(); l++) {
                             // SetElmt(i, k, 0);
                             temp = this.Elmt(j, l) - (this.Elmt(i, l) * faktor);
-                            this.SetElmt(j, l, temp);
+                            this.SetElmt(j, l, rounding(temp));
                         }
                     }
                     i++;
@@ -270,6 +273,12 @@ public class Matriks {
     	return solusi;
     }
 
+    public float rounding(float num) {
+        BigDecimal bd = new BigDecimal(num).setScale(5, RoundingMode.HALF_EVEN);
+        float out = bd.floatValue();
+        return out;
+    }
+
     public void printsolusispl(float[] solusi){
         int i;
         boolean isparam=false;
@@ -296,7 +305,7 @@ public class Matriks {
 
     public void printsolusisplunik(float[] solusi){
         for (int i=0;i<=GetLastIdxKol()-1;i++){
-            System.out.println("x" + (i+1) + " = " + solusi[i]);
+            System.out.println("x" + (i+1) + " = " + rounding(solusi[i]));
         }
     }
 
@@ -483,17 +492,13 @@ public class Matriks {
         else { 
             // A memiliki invers
             A = A.InversMatriks1();
-            A.TulisMatriks();
             // Perkalian invers A dengan B
             for (i=A.GetFirstIdxBrs(); i<=A.GetLastIdxBrs(); i++) {
                 temp = 0;
                 for (j=A.GetFirstIdxKol(); j<=A.GetLastIdxKol(); j++) {
                     temp += A.Elmt(i, j) * B.Elmt(j, 0);
-                    System.out.println(A.Elmt(i, j));
-                    System.out.println(B.Elmt(i, 0));
                 }
                 X[i] = temp;
-                System.out.println(X[i]);
             }
             if (homogen) {
                 // SPL memiliki solusi trivial
