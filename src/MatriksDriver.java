@@ -27,7 +27,7 @@ public class MatriksDriver {
                 } else if (pil1==4) {
                     System.out.println("Petunjuk:");
                     System.out.println("Jumlah baris : derajat + 1");
-                    System.out.println("Jumlah baris : 2");
+                    System.out.println("Jumlah kolom : 2");
                     M.BacaMatriks();
                 } else{ //Input Regresi
                     M.BacaInputRegresi();
