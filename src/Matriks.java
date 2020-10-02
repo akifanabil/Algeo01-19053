@@ -342,8 +342,6 @@ public class Matriks {
                             }
                             if (solusi[k]==999){
                                 //Menjumlahkan pada koefisien parametrik yang bersesuaian
-                                System.out.println(i);
-                                System.out.println(j);
                                 for (int l=0;l<=koef.GetLastIdxKol();l++){
                                     koef.SetElmt(j, l,koef.Elmt(j,l) - (Elmt(i,k)*koef.Elmt(k,l)));
                                 }
