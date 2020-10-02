@@ -125,9 +125,6 @@ public class Matriks {
             Readaline.close();
             Reader.close();
 
-            System.out.println(BrsEf);
-            System.out.println(KolEf);
-
             this.M = new double [this.BrsEf][this.KolEf];
             Reader = new Scanner(f);
 
@@ -141,6 +138,7 @@ public class Matriks {
             Reader.close();
         } catch (FileNotFoundException e){
             System.out.println("An error occurred.");
+            System.out.println("Pastikan input file benar atau file telah berada pada folder yang sama java byte code ini.");
             e.printStackTrace();
         }
     }
@@ -286,7 +284,7 @@ public class Matriks {
                 System.out.println("\nSistem Persamaan Linear memiliki banyak solusi sebagai berikut : ");
                 printsolusiparametrik(solusi);
             } else{
-                System.out.println("\nSistem Persamaan Linear memilikisebuah solusi unik.");
+                System.out.println("\nSistem Persamaan Linear memiliki sebuah solusi unik.");
                 printsolusisplunik(solusi);
             }
         }
@@ -962,11 +960,9 @@ public class Matriks {
 
         
         //Melakukan penyelesaian spl dengan metode gauss
-        splxy.TulisMatriks();
         splxy.ForwardPhase();
-        splxy.TulisMatriks();
         splxy.LeadingOne();
-        splxy.TulisMatriks();
+        
         double[] hasilspl=splxy.BackSubs();
 
         // Meminta input xk yaitu nilai nilai x yang ingin ditaksir nilai fungsinya
