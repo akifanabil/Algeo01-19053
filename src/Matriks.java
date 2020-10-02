@@ -366,8 +366,6 @@ public class Matriks {
             idemptypar--;
             j--;
         }
-        // char[] usedcc = new char[this.GetLastIdxKol()-1-idemptypar];
-        koef.TulisMatriks();
 
         boolean first;
         for (i = koef.GetFirstIdxBrs();i<=koef.GetLastIdxBrs();i++){
