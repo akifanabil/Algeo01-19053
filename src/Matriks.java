@@ -912,38 +912,44 @@ public class Matriks {
                     Persamaan.SetElmt(i, j, this.Elmt(i,y));
                 }
                 else {
-                    double Hasil = Math.pow(this.Elmt(i,x),j);
-                    double Pangkat = (double) Hasil;
+                    double Pangkat = Math.pow(this.Elmt(i,x),j);
                     Persamaan.SetElmt(i, j, Pangkat);
                 }
             }
         }
 
         // Mencari dan menampilkan koefisien persamaan
-        Persamaan.splGaussJordan();
+        double[] solusi;
+        Persamaan.ForwardPhase();
+        Persamaan.LeadingOne();
+        Persamaan.BackwardPhase();
+        solusi = Persamaan.BackSubs();
+        for (int i=0;i<Persamaan.GetLastIdxKol();i++){
+            System.out.println("a" + (i+1) + " = " + rounding(solusi[i]));
+        }
 
         // Menampilkan polinom interpolasi
         for (int i=Persamaan.GetFirstIdxBrs();i<=Persamaan.GetLastIdxBrs();i++) {
             if (i==0) {
                 System.out.print("p" + N + "(x) = ");
                 if (Persamaan.Elmt(i,Persamaan.GetLastIdxKol())!=0) {
-                    System.out.print(Persamaan.Elmt(i,Persamaan.GetLastIdxKol()));
+                    System.out.print(rounding(Persamaan.Elmt(i,Persamaan.GetLastIdxKol())));
                 }
             }
             else if (i==1) {
                 if (Persamaan.Elmt(i,Persamaan.GetLastIdxKol())>0) {
-                    System.out.print(" + " + Persamaan.Elmt(i,Persamaan.GetLastIdxKol()) + "x");
+                    System.out.print(" + " + rounding(Persamaan.Elmt(i,Persamaan.GetLastIdxKol())) + "x");
                 }
                 else if (Persamaan.Elmt(i,Persamaan.GetLastIdxKol())<0) {
-                    System.out.print(" - " + Math.abs(Persamaan.Elmt(i,Persamaan.GetLastIdxKol())) + "x");
+                    System.out.print(" - " + rounding(Math.abs(Persamaan.Elmt(i,Persamaan.GetLastIdxKol()))) + "x");
                 }
             }
             else {
                 if (Persamaan.Elmt(i,Persamaan.GetLastIdxKol())>0) {
-                    System.out.print(" + " + Persamaan.Elmt(i,Persamaan.GetLastIdxKol()) + "x^" + i);
+                    System.out.print(" + " + rounding(Persamaan.Elmt(i,Persamaan.GetLastIdxKol())) + "x^" + i);
                 }
                 else if (Persamaan.Elmt(i,Persamaan.GetLastIdxKol())<0) {
-                    System.out.print(" - " + Math.abs(Persamaan.Elmt(i,Persamaan.GetLastIdxKol())) + "x^" + i);
+                    System.out.print(" - " + rounding(Math.abs(Persamaan.Elmt(i,Persamaan.GetLastIdxKol()))) + "x^" + i);
                 }
             }
         }
@@ -955,9 +961,9 @@ public class Matriks {
 
         // Menampilkan hasil taksiran
         for (int i=Persamaan.GetFirstIdxBrs();i<Persamaan.GetLastIdxBrs();i++) {
-            Taksir += (Persamaan.Elmt(i,Persamaan.GetLastIdxKol())*(Math.pow(X,i)));
+            Taksir += (rounding(Persamaan.Elmt(i,Persamaan.GetLastIdxKol()))*(Math.pow(X,i)));
         }
-        System.out.println("Hasil taksiran polinom interpolasi yaitu : " + Taksir);
+        System.out.println("Hasil taksiran polinom interpolasi yaitu : " + rounding(Taksir));
     }
 
     public void BacaInputRegresi(){
