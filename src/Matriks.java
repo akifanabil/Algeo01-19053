@@ -135,7 +135,7 @@ public class Matriks {
             {
                 for(int j = 0; j <= KolEf-1;++j)
                 {
-                    SetElmt(i,j,rounding(Reader.nextDouble()));
+                    SetElmt(i,j,(Reader.nextDouble()));
                 }
             }
             Reader.close();
