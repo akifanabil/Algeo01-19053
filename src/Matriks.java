@@ -421,43 +421,6 @@ public class Matriks {
         }
         return isbrs0;
     }
-
-
-
-        //             if (konssolusi!=0){
-        //                 solusipar[j]=konssolusi+"";
-        //             } else{
-        //                 solusipar[j]="";
-        //             }
-
-        //             for (int k=j+1;k<GetLastIdxKol();k++){
-        //                 if (solusi[k]==-999){
-        //                     if (Elmt(i,k)>0){
-        //                         SetElmt(i,k,Elmt(i, k));
-
-        //                         solusipar[j]+="-"+Elmt(i,k)+solusipar[k];
-        //                     } else if (Elmt(i,k)<0){
-        //                         solusipar[j]+="+"+(-1*Elmt(i,k))+solusipar[k];
-        //                     }
-        //                 }
-        //             }
-
-
-        // for (i=0;i<=GetLastIdxKol()-1;i++){
-        //     if (solusi[i]==-999){
-        //         System.out.println("x" + (i+1) + " = " + solusipar[i]);
-        //     } else{
-        //         System.out.println("x" + (i+1) + " = " + solusi[i]);
-        //     }
-        // }
-
-        // cc = (char) (((int) cc)+1);
-        // System.out.print("Dengan "+ cc);
-
-        // for (i=(int) cc+1;i<=(int) 't';i++){
-        //     System.out.print(","+((char) i));
-        // }
-        // System.out.println(" bilangan real.");
     
     public void LeadingOne(){
         int i, j=this.GetFirstIdxKol(),k;
@@ -552,8 +515,6 @@ public class Matriks {
                 break;
             }
         }
-
-        A.TulisMatriks();
 
         // A^(-1)*A*x = A^(-1)*B maka dicari invers A
         if (A.Determinan2() == 0) {
@@ -694,21 +655,6 @@ public class Matriks {
                 System.out.println("\nSistem Persamaan Linear memiliki balikan, tidak homogen, dan memiliki solusi yang unik");
                 printsolusisplunik(X);
             }
-        }
-
-        for (j=A.GetFirstIdxKol(); j<=A.GetLastIdxKol(); j++) {
-            detMod = 0;
-
-            // Mengganti elemen A kolom j dengan elemen di matriks B
-            for (i=A.GetFirstIdxBrs(); i<=A.GetLastIdxBrs(); i++) {
-                AMod.SetElmt(i, j, B.Elmt(i, 0));
-            }
-
-            // Menghitung determinan 
-            detMod = AMod.Determinan2();
-
-            // Menghitung nilai X
-            X[j] = detMod/det;
         }
     }
 
