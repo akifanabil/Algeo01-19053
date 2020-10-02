@@ -232,8 +232,9 @@ public class Matriks {
     }
     
     public float[] BackSubs() {
+        boolean solusiparametrik;
         int i, j,k;
-        boolean eksak=true;
+        boolean eksak;
 
     	// Membuat array solusi dan inisialisasi value
     	float[] solusi = new float[KolEf-1];
@@ -243,6 +244,7 @@ public class Matriks {
         
     	// Menghitung solusi
     	for (i=GetLastIdxBrs(); i>=GetFirstIdxBrs(); i--) {
+            eksak=true;
             j=GetFirstIdxKol();
             while (Elmt(i,j)==0 && j<GetLastIdxKol()){
                 j++;
@@ -256,6 +258,7 @@ public class Matriks {
                     if (Elmt(i,k)!=0 && solusi[k]==-999){
                         eksak = false;
                         solusi[j]=-999;
+                        solusiparametrik = true;
                     } else{
                         solusi[j]-=solusi[k]*Elmt(i, k);
                         k--;
@@ -269,7 +272,7 @@ public class Matriks {
                     break;
                 }
             }
-    	}
+        }
     	return solusi;
     }
 
@@ -310,78 +313,129 @@ public class Matriks {
     }
 
     public void printsolusiparametrik(float[] solusi){
-        String[] solusipar = new String[KolEf-1];
 
         // Mencari leading 1 mulai dari baris terakhir
-        int i = GetLastIdxBrs();
-        int j;
+        int i;
+        int j=this.GetFirstIdxKol();
         char cc ='t';
-        int idemptypar=GetLastIdxKol()-1; //indeks dari elemen terakhir array solusi parametriks yg akan diisi
-        int niterasi;
-        float tempsolusi;
+        int idemptypar=this.GetLastIdxKol()-1; //indeks dari elemen terakhir array solusi parametrik yg akan diisi
 
-        while (i>=GetFirstIdxBrs()){
-            j = GetFirstIdxKol();
-            while (Elmt(i,j)==0 && j<=GetLastIdxKol()-1){
+        //Membuat sebuah matriks yg menyimpan nilai konstanta dan koefisien masing-masing variabel
+        //Baris menyatakan variabel (Baris 1 : x1, Baris 2 : x2, dst)
+        //Kolom menyatakan nilai nilai integer persamaan parametriks variabel pd baris yg bersangkutan dimana Kolom 1 : konstanta, (cth) Kolom 2 : koefisien parametrik p , Kolom 3 : koefisien q , dst
+        Matriks koef=new Matriks(this.GetLastIdxKol(),this.GetLastIdxKol());
+
+
+        for (i=this.GetLastIdxBrs();i>=this.GetFirstIdxBrs();i--){
+            j = this.GetFirstIdxKol();
+            while (this.Elmt(i,j)==0 && j<=this.GetLastIdxKol()-1){
                 j++;
             }
             //Elmt(i,j) == 1 or j=GetLastIdxKol()-1
             if (Elmt(i,j)==1){
                 if (solusi[j]==-999){
-                    //Solusi parametrik
-                    niterasi=0;
-                    for (int k=idemptypar;k>=j+1;k--){
+                    //Merupakan Solusi parametrik
+
+                    // 
+                    for (int k=GetLastIdxKol()-1;k>=j+1;k--){
                         if (solusi[k]==-999){
-                            solusipar[k]= cc+"";
-                            cc = (char) (((int) cc)-1);
-                            niterasi++;
+                            koef.SetElmt(k, idemptypar, 1); //Set elemen matriks koef baris ke k kolom ke idemptypar dgn 1 menandakan koefisien dari cc
+                            // solusipar[k]= cc+"";
+                            idemptypar--;
+                            solusi[k]= 999; //Penanda bahwa solusi parametrik telah ditemukan
                         }
                     }
 
-                    tempsolusi = Elmt(i,GetLastIdxKol());
-                    //mencari solusi eksak
+                    // Menjumlahkan
+                    koef.SetElmt(j,0, this.Elmt(i,this.GetLastIdxKol()));
                     for (int k=j+1;k<GetLastIdxKol();k++){
-                        if (solusi[k]!=-999){
-                            tempsolusi-=solusi[k]*Elmt(i,k);
-                        }
-                    }
-                    if (tempsolusi!=0){
-                        solusipar[j]=tempsolusi+"";
-                    } else{
-                        solusipar[j]="";
-                    }
-                    for (int k=j+1;k<GetLastIdxKol();k++){
-                        if (solusi[k]==-999){
-                            if (Elmt(i,k)>0){
-                                solusipar[j]+="-"+Elmt(i,k)+solusipar[k];
-                            } else if (Elmt(i,k)<0){
-                                solusipar[j]+="+"+(-1*Elmt(i,k))+solusipar[k];
+                        if (Elmt(i,k)!=0){
+                            if (solusi[k]!=999 && solusi[k]!=-999){
+                                //solusi eksak -> penjumlahan solusi eksak
+                                koef.SetElmt(j, 0, koef.Elmt(j,0)-(solusi[k]*Elmt(i,k)));
+                            }
+                            if (solusi[k]==999){
+                                //Menjumlahkan pada koefisien parametrik yang bersesuaian
+                                System.out.println(i);
+                                System.out.println(j);
+                                for (int l=0;l<=koef.GetLastIdxKol();l++){
+                                    koef.SetElmt(j, l,koef.Elmt(j,l) - (Elmt(i,k)*koef.Elmt(k,l)));
+                                }
                             }
                         }
                     }
-                    idemptypar-=niterasi;
+                    solusi[j]=999; //Penanda bahwa persamaan parametrik untuk solusi indeks j telah ditemukan
+
+
+                } else if (solusi[j]!=-999 && solusi[j]!=999){
+                    // Elmt(i,j) memiliki solusi eksak
+                    koef.SetElmt(j,0,solusi[j]);
                 }
             }
-            i--;
         }
+        j--;
+        
+        while (j>=GetFirstIdxKol()){
+            koef.SetElmt(j, idemptypar, 1);
+            idemptypar--;
+            j--;
+        }
+        // char[] usedcc = new char[this.GetLastIdxKol()-1-idemptypar];
+        koef.TulisMatriks();
 
-        for (i=0;i<=GetLastIdxKol()-1;i++){
-            if (solusi[i]==-999){
-                System.out.println("x" + (i+1) + " = " + solusipar[i]);
+        boolean first;
+        for (i = koef.GetFirstIdxBrs();i<=koef.GetLastIdxBrs();i++){
+            first=true;
+            System.out.print("x"+(i+1)+" = ");
+            if (koef.isbaris0(i)){
+                System.out.print(0);
             } else{
-                System.out.println("x" + (i+1) + " = " + solusi[i]);
+                for (j=koef.GetFirstIdxKol();j<=koef.GetLastIdxKol();j++){
+                    if (first && koef.Elmt(i,j)!=0){
+                        System.out.print(koef.Elmt(i, j));
+                        if (j!=0){
+                            System.out.print(((char) ((int) cc - koef.KolEf +j+1)));
+                        }
+                        first=false;
+                    } else if (koef.Elmt(i, j)<0 && !first){
+                        System.out.print("-"+(-1*koef.Elmt(i, j)));
+                        if (j!=0){
+                            System.out.print(((char) ((int) cc - koef.KolEf +j+1)));
+                        }
+                    } else if (koef.Elmt(i,j)>0 && !first){
+                        System.out.print("+"+(koef.Elmt(i, j)));
+                        if (j!=0){
+                            System.out.print(((char) ((int) cc - koef.KolEf +j+1)));
+                        }
+                    }
+                }
             }
+            System.out.println("");
         }
 
-        cc = (char) (((int) cc)+1);
-        System.out.print("Dengan "+ cc);
-
-        for (i=(int) cc+1;i<=(int) 't';i++){
-            System.out.print(","+((char) i));
-        }
-        System.out.println(" bilangan real.");
+        // Menulis keterangan variabel parametrik adalah bilangan real
+        char firstcc= (char) ((int) 't' + (koef.GetFirstIdxKol()-idemptypar));
+        System.out.print("Dengan "+ firstcc);
+            for (i=(int) firstcc+1;i<=(int) 't';i++){
+                System.out.print(","+((char) i));
+            }
+            System.out.println(" bilangan real.");
     }
     
+    public boolean isbaris0(int i){
+        // Mengembalikan true jika semua elemen baris suatu matriks adalah 0
+        boolean isbrs0=true;
+        int j=GetFirstIdxKol();
+        while (j<=GetLastIdxKol() && isbrs0){
+            if (Elmt(i,j)!=0){
+                isbrs0=false;
+            } else{
+                j++;
+            }
+        }
+        return isbrs0;
+    }
+
     public void LeadingOne(){
         int i, j=this.GetFirstIdxKol(),k;
         float pembagi;

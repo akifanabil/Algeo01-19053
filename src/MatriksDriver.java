@@ -52,6 +52,12 @@ public class MatriksDriver {
                     M.splGauss();
                 } else if(pil2==2){
                     // Metode eliminasi Gauss-Jordan
+                    M.ForwardPhase();
+                    M.TulisMatriks();
+                    M.LeadingOne();
+                    M.TulisMatriks();
+                    M.BackwardPhase();
+                    M.TulisMatriks();
                     M.splGaussJordan();
                 } else if (pil2==3){
                     // Metode matriks balikan
