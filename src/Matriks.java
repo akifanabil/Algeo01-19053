@@ -14,6 +14,7 @@ public class Matriks {
     int Tukar = 0;
     boolean nosolutionspl;
     boolean singular;
+    boolean solusiparametrik;
     float[][] M;
 
     Scanner scanner = new Scanner(System.in);
@@ -232,7 +233,6 @@ public class Matriks {
     }
     
     public float[] BackSubs() {
-        boolean solusiparametrik;
         int i, j,k;
         boolean eksak;
 
@@ -934,21 +934,22 @@ public class Matriks {
         System.out.println("Input nilai variabel peubah x dan variabel terkait y");
         System.out.print("Masukkan banyak variabel peubah x : ");
         int N = scanner.nextInt();
-        KolEf = N+1;
+        this.KolEf = N+1;
         System.out.print("Masukkan banyak data yang ingin diinput : ");
-        BrsEf = scanner.nextInt();
+        this.BrsEf = scanner.nextInt();
 
 
-        // Membuat sebuah matriks xy dan mengisi nilai sesuai masukan user
-        M = new float [BrsEf][KolEf];
+        // Membuat matriks M yg berisi data nilai x dan y sesuai masukan user
+        this.M = new float [BrsEf][KolEf];
         for (int i=this.GetFirstIdxBrs();i<=this.GetLastIdxBrs();i++){
             for (int j=this.GetFirstIdxKol();j<this.GetLastIdxKol();j++){
                 System.out.print("Masukkan nilai x"+(j+1)+(i+1)+" : ");
-                SetElmt(i, j, scanner.nextFloat());
+                this.SetElmt(i, j, scanner.nextFloat());
             }
             System.out.print("Masukkan nilai y"+(i+1)+"  : ");
-            SetElmt(i, this.GetLastIdxKol(), scanner.nextFloat());
+            this.SetElmt(i, this.GetLastIdxKol(), scanner.nextFloat());
         }
+        this.TulisMatriks();
     }
     
     public void regresilinearganda(){
@@ -961,7 +962,7 @@ public class Matriks {
 
         // Set elemen baris pertama kolom kedua hingga akhir dan kolom pertama baris kedua hingga akhir
         for (int i=splxy.GetFirstIdxKol()+1;i<=splxy.GetLastIdxKol();i++){
-            float sum = 0;
+            float sum= 0;
             for (int j=GetFirstIdxBrs();j<=GetLastIdxBrs();j++){
                 sum+=Elmt(j, i-1);
             }
@@ -982,35 +983,42 @@ public class Matriks {
             }
         }
 
-
-        //Melakukan penyelesaian spl dengan metode gauss
+        
+        // Melakukan penyelesaian spl dengan metode gauss
+        splxy.TulisMatriks();
         splxy.ForwardPhase();
+        splxy.TulisMatriks();
         splxy.LeadingOne();
+        splxy.TulisMatriks();
         float[] hasilspl=splxy.BackSubs();
 
         // Meminta input xk yaitu nilai nilai x yang ingin ditaksir nilai fungsinya
-        Matriks xk = new Matriks(1,KolEf-1);
+        Matriks xk = new Matriks(1,this.KolEf-1);
         System.out.println("\nInput nilai-nilai x yang ingin ditaksir nilai fungsinya");
         for (int j=xk.GetFirstIdxKol();j<=xk.GetLastIdxKol();j++){
             System.out.print("Masukkan nilai x"+(j+1)+" : ");
             xk.SetElmt(xk.GetFirstIdxBrs(), j, scanner.nextFloat());
         }
 
-        System.out.print("\nPersamaan regresi linear: \nyi ="+hasilspl[0]);
-        for (int i=1;i<hasilspl.length;i++){
-            if (hasilspl[i]>0){
-                System.out.print(" + "+hasilspl[i]+"x"+(i+1));
-            } else{
-                System.out.print(" - "+(-1 * hasilspl[i])+"x"+(i+1));
+        if (!splxy.nosolutionspl && !splxy.solusiparametrik){
+            System.out.print("\nPersamaan regresi linear: \ny ="+rounding(hasilspl[0]));
+            for (int i=1;i<hasilspl.length;i++){
+                if (hasilspl[i]>0){
+                    System.out.print(" + "+rounding(hasilspl[i])+"x"+(i));
+                } else{
+                    System.out.print(" - "+(-1 * rounding(hasilspl[i]))+"x"+(i));
+                }
             }
-        }
 
-        // Menuliskan hasil taksiran fungsi
-        System.out.print("\nHasil taksiran fungsi : \n");
-        float sum=hasilspl[0];
-        for (int i=1;i<hasilspl.length;i++){
-            sum+=hasilspl[i]*xk.Elmt(xk.GetFirstIdxBrs(), i-1);
+            // Menuliskan hasil taksiran fungsi
+            System.out.print("\n\nHasil taksiran fungsi : ");
+            float sum=hasilspl[0];
+            for (int i=1;i<hasilspl.length;i++){
+                sum+=hasilspl[i]*xk.Elmt(xk.GetFirstIdxBrs(), i-1);
+            }
+            System.out.println(rounding(sum));
+        } else{
+            System.out.println("Terdapat kesalahan/kekurangan input data sehingga nilai taksiran tidak dapat diperoleh.");
         }
-        System.out.println(sum);
     }
 }
