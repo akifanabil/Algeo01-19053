@@ -463,8 +463,6 @@ public class Matriks {
         int i, j=this.GetFirstIdxKol(),k;
         Double pembagi;
 
-        this.TulisMatriks();
-
         for (i=this.GetFirstIdxBrs();i<=this.GetLastIdxBrs();i++){
             while (j<this.GetLastIdxKol() && this.Elmt(i,j)==0){
                 j++;
