@@ -2,9 +2,8 @@ import java.util.Scanner;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.lang.Math;
-import java.text.DecimalFormat;
+import java.math.RoundingMode;
 import java.math.BigDecimal;
-import java.math.RoundingMode; 
 
 public class Matriks {
 
@@ -13,9 +12,9 @@ public class Matriks {
     int KolMin = 0;
     int Tukar = 0;
     boolean nosolutionspl;
-    boolean singular;
     boolean solusiparametrik;
-    float[][] M;
+    boolean singular;
+    double[][] M;
 
     Scanner scanner = new Scanner(System.in);
 
@@ -29,7 +28,7 @@ public class Matriks {
     public Matriks(int nbrs,int nklm)
     {
         //Membentuk matriks dengan ukuran baris efektif nbrs dan kolom efektif nklm
-        M = new float[nbrs+BrsMin][nklm+KolMin];
+        M = new double[nbrs+BrsMin][nklm+KolMin];
         BrsEf = nbrs;
         KolEf = nklm;
     }
@@ -71,13 +70,13 @@ public class Matriks {
             System.out.print("Input tidak valid. Harap masukan banyak kolom dengan integer > 0 : ");
             this.KolEf = scanner.nextInt();
         }
-        M = new float [BrsEf][KolEf];
+        M = new double [BrsEf][KolEf];
         for (i=this.GetFirstIdxBrs();i<=this.GetLastIdxBrs();i++)
         {
             for (j=this.GetFirstIdxKol();j<=this.GetLastIdxKol();j++)
             {
                 System.out.print("Masukkan Elemen Matriks Baris "+(i+1)+" Kolom "+(j+1)+" : ");
-                this.M[i][j] = scanner.nextFloat();
+                this.M[i][j] = rounding(scanner.nextDouble());
             }
         }
     }
@@ -93,13 +92,13 @@ public class Matriks {
             this.BrsEf = scanner.nextInt();
         }
         this.KolEf = this.BrsEf;
-        M = new float [BrsEf][KolEf];
+        M = new double [BrsEf][KolEf];
         for (i=GetFirstIdxBrs();i<=GetLastIdxBrs();i++)
         {
             for (j=GetFirstIdxKol();j<=GetLastIdxKol();j++)
             {
                 System.out.print("Masukkan Elemen Matriks Baris "+(i+1)+" Kolom "+(j+1)+" : ");
-                SetElmt(i,j,scanner.nextFloat());
+                SetElmt(i,j,scanner.nextDouble());
             }
         }
     }
@@ -118,39 +117,27 @@ public class Matriks {
             Reader = new Scanner(f);
             Scanner Readaline = new Scanner(Reader.nextLine());
             this.KolEf=0;
-            while (Readaline.hasNextFloat()) {
+            while (Readaline.hasNextDouble()) {
                 this.KolEf++;
-                Readaline.nextFloat();
+                Readaline.nextDouble();
             }
-            // this.KolEf=nel/this.BrsEf;
+            
             Readaline.close();
             Reader.close();
 
-            // System.out.println(nel);
             System.out.println(BrsEf);
             System.out.println(KolEf);
 
-            this.M = new float [this.BrsEf][this.KolEf];
+            this.M = new double [this.BrsEf][this.KolEf];
             Reader = new Scanner(f);
 
             for(int i = 0; i <= BrsEf-1; ++i)
             {
                 for(int j = 0; j <= KolEf-1;++j)
                 {
-                    SetElmt(i,j,Reader.nextFloat());
+                    SetElmt(i,j,rounding(Reader.nextDouble()));
                 }
             }
-            // while (Readaline.hasNextLine()) {
-            //     Readaline = new Scanner(Reader.nextLine());
-            //     while (Readaline.hasNextFloat()){
-            //         n = Readaline.nextFloat();
-            //         SetElmt(i, j, n);
-            //         j++;
-            //     }
-            //     i++;
-            //     j=0;
-            // }
-            // this.KolEf=nel/this.BrsEf;
             Reader.close();
         } catch (FileNotFoundException e){
             System.out.println("An error occurred.");
@@ -158,12 +145,12 @@ public class Matriks {
         }
     }
 
-    public float Elmt(int idxbrs, int idxkol){
+    public double Elmt(int idxbrs, int idxkol){
         // Mendapat elemen matriks M baris id ke [idxbrs][idxkol]
         return this.M[idxbrs][idxkol];
     }
 
-    public void SetElmt(int idbrs,int idklm, float val){
+    public void SetElmt(int idbrs,int idklm, double val){
         this.M[idbrs][idklm] = val;
     }
 
@@ -181,7 +168,7 @@ public class Matriks {
 
     public void TukarBaris(int i1, int i2) {
     	int j;
-    	float temp;
+    	double temp;
     	
     	// Menukar baris
     	for (j=GetFirstIdxKol(); j<=GetLastIdxKol(); j++) {
@@ -192,10 +179,9 @@ public class Matriks {
     }
     
     public void ForwardPhase() {
-    	int i=GetFirstIdxBrs(),j, k;
-        float faktor, temp;
+    	int i=this.GetFirstIdxBrs(),j, k;
+        double faktor, temp;
         boolean foundnot0;
-        
     	
     	for (k=this.GetFirstIdxKol(); k<this.GetLastIdxKol(); k++) {
             if (i<=this.GetLastIdxBrs()){
@@ -229,15 +215,15 @@ public class Matriks {
                     i++;
                 }
             }
-    	}
+        }
     }
     
-    public float[] BackSubs() {
+    public double[] BackSubs() {
         int i, j,k;
         boolean eksak;
 
     	// Membuat array solusi dan inisialisasi value
-    	float[] solusi = new float[KolEf-1];
+    	double[] solusi = new double[KolEf-1];
     	for (j=GetFirstIdxKol(); j<=GetLastIdxKol()-1; j++) {
     		solusi[j] = -999;
         }
@@ -276,13 +262,13 @@ public class Matriks {
     	return solusi;
     }
 
-    public float rounding(float num) {
-        BigDecimal bd = new BigDecimal(num).setScale(5, RoundingMode.HALF_EVEN);
-        float out = bd.floatValue();
+    public double rounding(double num) {
+        BigDecimal bd = new BigDecimal(num).setScale(5, RoundingMode.DOWN);
+        double out = bd.doubleValue();
         return out;
     }
 
-    public void printsolusispl(float[] solusi){
+    public void printsolusispl(double[] solusi){
         int i;
         boolean isparam=false;
         if (nosolutionspl){
@@ -306,13 +292,13 @@ public class Matriks {
         }
     }
 
-    public void printsolusisplunik(float[] solusi){
+    public void printsolusisplunik(double[] solusi){
         for (int i=0;i<=GetLastIdxKol()-1;i++){
             System.out.println("x" + (i+1) + " = " + rounding(solusi[i]));
         }
     }
 
-    public void printsolusiparametrik(float[] solusi){
+    public void printsolusiparametrik(double[] solusi){
 
         // Mencari leading 1 mulai dari baris terakhir
         int i;
@@ -342,7 +328,7 @@ public class Matriks {
                             koef.SetElmt(k, idemptypar, 1); //Set elemen matriks koef baris ke k kolom ke idemptypar dgn 1 menandakan koefisien dari cc
                             // solusipar[k]= cc+"";
                             idemptypar--;
-                            solusi[k]= 999; //Penanda bahwa solusi parametrik telah ditemukan
+                            solusi[k]=(double) 999; //Penanda bahwa solusi parametrik telah ditemukan
                         }
                     }
 
@@ -364,7 +350,7 @@ public class Matriks {
                             }
                         }
                     }
-                    solusi[j]=999; //Penanda bahwa persamaan parametrik untuk solusi indeks j telah ditemukan
+                    solusi[j]=(double) 999; //Penanda bahwa persamaan parametrik untuk solusi indeks j telah ditemukan
 
 
                 } else if (solusi[j]!=-999 && solusi[j]!=999){
@@ -421,7 +407,7 @@ public class Matriks {
             }
             System.out.println(" bilangan real.");
     }
-    
+
     public boolean isbaris0(int i){
         // Mengembalikan true jika semua elemen baris suatu matriks adalah 0
         boolean isbrs0=true;
@@ -436,25 +422,64 @@ public class Matriks {
         return isbrs0;
     }
 
+
+
+        //             if (konssolusi!=0){
+        //                 solusipar[j]=konssolusi+"";
+        //             } else{
+        //                 solusipar[j]="";
+        //             }
+
+        //             for (int k=j+1;k<GetLastIdxKol();k++){
+        //                 if (solusi[k]==-999){
+        //                     if (Elmt(i,k)>0){
+        //                         SetElmt(i,k,Elmt(i, k));
+
+        //                         solusipar[j]+="-"+Elmt(i,k)+solusipar[k];
+        //                     } else if (Elmt(i,k)<0){
+        //                         solusipar[j]+="+"+(-1*Elmt(i,k))+solusipar[k];
+        //                     }
+        //                 }
+        //             }
+
+
+        // for (i=0;i<=GetLastIdxKol()-1;i++){
+        //     if (solusi[i]==-999){
+        //         System.out.println("x" + (i+1) + " = " + solusipar[i]);
+        //     } else{
+        //         System.out.println("x" + (i+1) + " = " + solusi[i]);
+        //     }
+        // }
+
+        // cc = (char) (((int) cc)+1);
+        // System.out.print("Dengan "+ cc);
+
+        // for (i=(int) cc+1;i<=(int) 't';i++){
+        //     System.out.print(","+((char) i));
+        // }
+        // System.out.println(" bilangan real.");
+    
     public void LeadingOne(){
         int i, j=this.GetFirstIdxKol(),k;
-        float pembagi;
+        Double pembagi;
+
+        this.TulisMatriks();
 
         for (i=this.GetFirstIdxBrs();i<=this.GetLastIdxBrs();i++){
             while (j<this.GetLastIdxKol() && this.Elmt(i,j)==0){
                 j++;
             }
-            if (this.Elmt(i, j)!=0){
+            if (this.Elmt(i, j)!=0.0){
                 pembagi = this.Elmt(i,j);
                 for (k=j;k<=this.GetLastIdxKol();k++){
-                    SetElmt(i,k,this.Elmt(i,k)/pembagi);
+                    this.SetElmt(i,k,this.Elmt(i,k)/pembagi);
                 }
             }
         }
     }
 
     public void splGauss(){
-        float[] solusi;
+        double[] solusi;
 
         ForwardPhase();
         LeadingOne();
@@ -464,7 +489,7 @@ public class Matriks {
 
     public void BackwardPhase() {
         int i, j, k, l;
-        float faktor, temp;
+        Double faktor, temp;
 
         i=this.GetLastIdxBrs();
         j=this.GetFirstIdxKol();
@@ -488,7 +513,7 @@ public class Matriks {
     }
 
     public void splGaussJordan(){
-        float[] solusi;
+        double[] solusi;
 
         ForwardPhase();
         LeadingOne();
@@ -499,23 +524,26 @@ public class Matriks {
 
     public void splMatriksBalikan() {
         int i, j; 
-        float temp;
+        double temp;
         boolean homogen = true;
 
         // Dimisalkan SPL berbentuk AX=B maka dideklarasikan matriks berikut
         Matriks A = new Matriks(this.BrsEf,this.KolEf-1);
         Matriks B = new Matriks(this.BrsEf, 1);
-        float[] X = new float[this.BrsEf];
+        double[] X = new double[this.BrsEf];
 
         // Menyalin elemen ke matriks A
-        for(i=A.GetFirstIdxBrs();i<=A.GetLastIdxBrs();i++) {
-            for (j=A.GetFirstIdxKol();j<=A.GetLastIdxKol();j++) {
+        for(i=A.GetFirstIdxBrs();i<=A.GetLastIdxBrs();i++)
+        {
+            for (j=A.GetFirstIdxKol();j<=A.GetLastIdxKol();j++)
+            {
                 A.SetElmt(i, j, this.Elmt(i, j));
             }
         }
 
         // Menyalin elemen ke matriks B
-        for(i=this.GetFirstIdxBrs();i<=this.GetLastIdxBrs();i++) {
+        for(i=this.GetFirstIdxBrs();i<=this.GetLastIdxBrs();i++)
+        {
             B.SetElmt(i, 0, this.Elmt(i, this.GetLastIdxKol()));
         }
 
@@ -527,42 +555,45 @@ public class Matriks {
             }
         }
 
+        A.TulisMatriks();
+
         // A^(-1)*A*x = A^(-1)*B maka dicari invers A
         if (A.Determinan2() == 0) {
             // A tidak punya invers
             if (homogen) {
                 // SPL memiliki solusi non-trivial
-                System.out.println("\nSistem Persamaan Linear tidak memiliki balikan, homogen, dan memiliki solusi non-trivial");
+                System.out.println("\nSistem Persamaan Linear tidak memiliki balikan dan memiliki solusi non-trivial");
                 // Menghitung solusi menggunakan metode lain
                 splGauss();
             }
             else {
                 // SPL tidak memiliki solusi yang tunggal (unik)
-                System.out.println("\nSistem Persamaan Linear tidak memiliki balikan, tidak homogen, dan tidak memiliki solusi yang unik");
+                System.out.println("\nSistem Persamaan Linear tidak memiliki balikan dan tidak memiliki solusi yang unik");
                 splGauss();
             }
             // System.out.println("\nSistem Persamaan Linear tidak memiliki penyelesaian.");
         }
         else { 
             // A memiliki invers
-            A = A.InversMatriks1();
+            A=InversMatriks1();
             // Perkalian invers A dengan B
             for (i=A.GetFirstIdxBrs(); i<=A.GetLastIdxBrs(); i++) {
                 temp = 0;
                 for (j=A.GetFirstIdxKol(); j<=A.GetLastIdxKol(); j++) {
                     temp += A.Elmt(i, j) * B.Elmt(j, 0);
                 }
+                // X.SetElmt(j, 1, temp);
                 X[i] = temp;
             }
             if (homogen) {
                 // SPL memiliki solusi trivial
-                System.out.println("\nSistem Persamaan Linear memiliki balikan, homogen, dan memiliki solusi trivial");
+                System.out.println("\nSistem Persamaan Linear memiliki balikan dan memiliki solusi trivial");
                 // Menghitung solusi menggunakan metode lain
                 printsolusisplunik(X);
             }
             else {
                 // SPL memiliki solusi yang tunggal (unik)
-                System.out.println("\nSistem Persamaan Linear memiliki balikan, tidak homogen, dan memiliki solusi yang unik");
+                System.out.println("\nSistem Persamaan Linear memiliki balikan dan memiliki solusi yang unik");
                 printsolusisplunik(X);
             }
         }
@@ -571,14 +602,14 @@ public class Matriks {
 
     public void splCramer() {
         int i, j, k;
-        float det, detMod;
+        double det, detMod;
         boolean homogen = true;
 
         // Dimisalkan SPL berbentuk AX=B maka dideklarasikan matriks berikut
         Matriks A = new Matriks(this.BrsEf,this.KolEf-1);
         Matriks AMod = new Matriks(this.BrsEf,this.KolEf-1);
         Matriks B = new Matriks(this.BrsEf, 1);
-        float[] X = new float[this.BrsEf];
+        double[] X = new double[this.BrsEf];
 
         // Menyalin elemen ke matriks A
         for(i=A.GetFirstIdxBrs();i<=A.GetLastIdxBrs();i++) {
@@ -740,9 +771,9 @@ public class Matriks {
         }
     }
 
-    public float Determinan1() {
+    public double Determinan1() {
         // Mencari Determinan dengan menggunakan metode Reduksi Baris
-        float Det=1;
+        double Det=1;
 
         // Mengubah matriks menjadi matriks segitiga atas
         this.ForwardPhase();
@@ -761,9 +792,9 @@ public class Matriks {
         return Det;
     }
 
-    public float Determinan2() {
+    public double Determinan2() {
         // Mencari Determinan dengan menggunakan metode Ekspansi Kofaktor
-        float Det=0;
+        double Det=0;
         int Baris1=GetFirstIdxBrs();
 
         // Menbentuk matriks minor -> mencari minor -> matriks kofaktor
@@ -833,7 +864,7 @@ public class Matriks {
         Matriks Invers = new Matriks(this.BrsEf,this.KolEf);
         Adjoin = Kofaktor.Transpose();
 
-        float determinan=Determinan1();
+        double determinan=Determinan1();
 
         if (determinan !=0){
             for (int i=GetFirstIdxBrs();i<=GetLastIdxBrs();i++){
@@ -862,7 +893,7 @@ public class Matriks {
 
     public void Interpolasi() {
         // Mencari polinom interpolasi derajat n
-        float Taksir=0;
+        double Taksir=0;
         System.out.print("Masukkan derajat polinom interpolasi : ");
         int N = scanner.nextInt();
 
@@ -882,7 +913,7 @@ public class Matriks {
                 }
                 else {
                     double Hasil = Math.pow(this.Elmt(i,x),j);
-                    float Pangkat = (float)Hasil;
+                    double Pangkat = (double) Hasil;
                     Persamaan.SetElmt(i, j, Pangkat);
                 }
             }
@@ -920,7 +951,7 @@ public class Matriks {
 
         // Menerima nilai X yang ingin ditaksir
         System.out.print("Masukkan nilai X yang ingin ditaksir : ");
-        Float X = scanner.nextFloat();
+        double X = scanner.nextDouble();
 
         // Menampilkan hasil taksiran
         for (int i=Persamaan.GetFirstIdxBrs();i<Persamaan.GetLastIdxBrs();i++) {
@@ -940,14 +971,14 @@ public class Matriks {
 
 
         // Membuat matriks M yg berisi data nilai x dan y sesuai masukan user
-        this.M = new float [BrsEf][KolEf];
+        this.M = new double [BrsEf][KolEf];
         for (int i=this.GetFirstIdxBrs();i<=this.GetLastIdxBrs();i++){
             for (int j=this.GetFirstIdxKol();j<this.GetLastIdxKol();j++){
                 System.out.print("Masukkan nilai x"+(j+1)+(i+1)+" : ");
-                this.SetElmt(i, j, scanner.nextFloat());
+                this.SetElmt(i, j, scanner.nextDouble());
             }
             System.out.print("Masukkan nilai y"+(i+1)+"  : ");
-            this.SetElmt(i, this.GetLastIdxKol(), scanner.nextFloat());
+            this.SetElmt(i, this.GetLastIdxKol(), scanner.nextDouble());
         }
         this.TulisMatriks();
     }
@@ -962,7 +993,7 @@ public class Matriks {
 
         // Set elemen baris pertama kolom kedua hingga akhir dan kolom pertama baris kedua hingga akhir
         for (int i=splxy.GetFirstIdxKol()+1;i<=splxy.GetLastIdxKol();i++){
-            float sum= 0;
+            double sum = 0;
             for (int j=GetFirstIdxBrs();j<=GetLastIdxBrs();j++){
                 sum+=Elmt(j, i-1);
             }
@@ -975,7 +1006,7 @@ public class Matriks {
         // Set elemen tersisa yg belum diisi
         for (int i=splxy.GetFirstIdxBrs()+1;i<=splxy.GetLastIdxBrs();i++){
             for (int j=splxy.GetFirstIdxKol()+1;j<=splxy.GetLastIdxKol();j++){
-                float sum = 0;
+                double sum = 0;
                 for (int k=GetFirstIdxBrs();k<=GetLastIdxBrs();k++){
                     sum+=Elmt(k, i-1)*Elmt(k, j-1);
                 }
@@ -984,20 +1015,20 @@ public class Matriks {
         }
 
         
-        // Melakukan penyelesaian spl dengan metode gauss
+        //Melakukan penyelesaian spl dengan metode gauss
         splxy.TulisMatriks();
         splxy.ForwardPhase();
         splxy.TulisMatriks();
         splxy.LeadingOne();
         splxy.TulisMatriks();
-        float[] hasilspl=splxy.BackSubs();
+        double[] hasilspl=splxy.BackSubs();
 
         // Meminta input xk yaitu nilai nilai x yang ingin ditaksir nilai fungsinya
         Matriks xk = new Matriks(1,this.KolEf-1);
         System.out.println("\nInput nilai-nilai x yang ingin ditaksir nilai fungsinya");
         for (int j=xk.GetFirstIdxKol();j<=xk.GetLastIdxKol();j++){
             System.out.print("Masukkan nilai x"+(j+1)+" : ");
-            xk.SetElmt(xk.GetFirstIdxBrs(), j, scanner.nextFloat());
+            xk.SetElmt(xk.GetFirstIdxBrs(), j, scanner.nextDouble());
         }
 
         if (!splxy.nosolutionspl && !splxy.solusiparametrik){
@@ -1012,7 +1043,7 @@ public class Matriks {
 
             // Menuliskan hasil taksiran fungsi
             System.out.print("\n\nHasil taksiran fungsi : ");
-            float sum=hasilspl[0];
+            double sum=hasilspl[0];
             for (int i=1;i<hasilspl.length;i++){
                 sum+=hasilspl[i]*xk.Elmt(xk.GetFirstIdxBrs(), i-1);
             }
